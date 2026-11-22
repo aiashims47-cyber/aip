@@ -1,0 +1,3103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VaultGuard — Smart Personal & Family Finance Guardrails</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <style>
+    :root {
+      --bg-base: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-card-glass: rgba(255, 255, 255, 0.96);
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --accent-primary: #0f172a;
+      --accent-primary-hover: #1e293b;
+      --accent-secondary: #10b981;
+      --accent-soft: #ecfdf5;
+      --nav-bg: #ffffff;
+      --shadow-card: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+    }
+
+    /* Theme 1: Crisp Fintech Slate (Default) */
+    [data-theme="slate"] {
+      --bg-base: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-card-glass: rgba(255, 255, 255, 0.94);
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --accent-primary: #0f172a;
+      --accent-primary-hover: #1e293b;
+      --accent-secondary: #10b981;
+      --accent-soft: #f1f5f9;
+      --nav-bg: #ffffff;
+    }
+
+    /* Theme 2: Emerald Mint */
+    [data-theme="emerald"] {
+      --bg-base: #ecfdf5;
+      --bg-card: #ffffff;
+      --bg-card-glass: rgba(255, 255, 255, 0.93);
+      --text-main: #064e3b;
+      --text-muted: #047857;
+      --border-color: #a7f3d0;
+      --accent-primary: #059669;
+      --accent-primary-hover: #047857;
+      --accent-secondary: #10b981;
+      --accent-soft: #d1fae5;
+      --nav-bg: #ffffff;
+    }
+
+    /* Theme 3: Royal Indigo */
+    [data-theme="indigo"] {
+      --bg-base: #eef2ff;
+      --bg-card: #ffffff;
+      --bg-card-glass: rgba(255, 255, 255, 0.93);
+      --text-main: #1e1b4b;
+      --text-muted: #4338ca;
+      --border-color: #c7d2fe;
+      --accent-primary: #4f46e5;
+      --accent-primary-hover: #4338ca;
+      --accent-secondary: #6366f1;
+      --accent-soft: #e0e7ff;
+      --nav-bg: #ffffff;
+    }
+
+    /* Theme 4: Sunset Coral */
+    [data-theme="coral"] {
+      --bg-base: #fff1f2;
+      --bg-card: #ffffff;
+      --bg-card-glass: rgba(255, 255, 255, 0.93);
+      --text-main: #4c0519;
+      --text-muted: #9f1239;
+      --border-color: #fecdd3;
+      --accent-primary: #e11d48;
+      --accent-primary-hover: #be123c;
+      --accent-secondary: #f97316;
+      --accent-soft: #ffe4e6;
+      --nav-bg: #ffffff;
+    }
+
+    /* Theme 5: Midnight Neon (Dark Mode) */
+    [data-theme="midnight"] {
+      --bg-base: #090d16;
+      --bg-card: #111827;
+      --bg-card-glass: rgba(17, 24, 39, 0.88);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #1f2937;
+      --accent-primary: #10b981;
+      --accent-primary-hover: #059669;
+      --accent-secondary: #38bdf8;
+      --accent-soft: #1e293b;
+      --nav-bg: #111827;
+      --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      transition: background-color 0.3s ease, color 0.3s ease;
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      min-height: 100vh;
+    }
+
+    body.has-custom-bg {
+      background-image: var(--custom-bg-url);
+    }
+
+    body.has-custom-bg::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.38);
+      backdrop-filter: blur(4px);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    h1, h2, h3, .font-display {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .vg-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-card);
+      border-radius: 1rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
+    }
+
+    body.has-custom-bg .vg-card {
+      background-color: var(--bg-card-glass);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .vg-nav {
+      background-color: var(--nav-bg);
+      border-color: var(--border-color);
+    }
+
+    body.has-custom-bg .vg-nav {
+      background-color: var(--bg-card-glass);
+      backdrop-filter: blur(16px);
+    }
+
+    .vg-btn-primary {
+      background-color: var(--accent-primary);
+      color: #ffffff;
+      transition: all 0.2s ease;
+    }
+    .vg-btn-primary:hover {
+      background-color: var(--accent-primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .vg-input {
+      background-color: var(--bg-card);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      border-radius: 0.75rem;
+      padding: 0.65rem 0.9rem;
+      width: 100%;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .vg-input:focus {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+    }
+
+    .text-muted {
+      color: var(--text-muted);
+    }
+
+    .bg-soft {
+      background-color: var(--accent-soft);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(100, 116, 139, 0.35);
+      border-radius: 999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(100, 116, 139, 0.55);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+      animation: fadeIn 0.3s ease-out forwards;
+    }
+  </style>
+</head>
+<body data-theme="slate" class="antialiased selection:bg-emerald-500 selection:text-white">
+
+  <!-- ==================== GLOBAL TOAST / NOTIFICATION BANNER ==================== -->
+  <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
+
+  <!-- ==================== 1. AUTHENTICATION VIEW (SIGN IN / SIGN UP / VERIFY) ==================== -->
+  <section id="view-auth" class="min-h-screen flex items-center justify-center p-4 sm:p-6">
+    <div class="vg-card w-full max-w-md p-6 sm:p-8 animate-fade-in">
+      <!-- Brand Header -->
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-11 h-11 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-lg shadow-emerald-600/20">
+          <i class="fa-solid fa-shield-halved text-xl"></i>
+        </div>
+        <div>
+          <h1 class="text-2xl font-extrabold tracking-tight">VaultGuard</h1>
+          <p class="text-xs text-muted font-medium">Personal & Family Anti-Overspending Engine</p>
+        </div>
+      </div>
+
+      <!-- Auth Tabs -->
+      <div id="auth-tabs" class="grid grid-cols-2 gap-1 p-1 rounded-xl bg-soft mb-6">
+        <button type="button" onclick="switchAuthMode('signin')" id="tab-signin" class="py-2 text-sm font-semibold rounded-lg bg-white text-slate-900 shadow-sm transition">Sign In</button>
+        <button type="button" onclick="switchAuthMode('signup')" id="tab-signup" class="py-2 text-sm font-semibold rounded-lg text-muted hover:text-slate-900 transition">Create Account</button>
+      </div>
+
+      <!-- Sign In Form -->
+      <form id="form-signin" onsubmit="handleSignIn(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-muted mb-1.5">Email Address</label>
+          <div class="relative">
+            <i class="fa-regular fa-envelope absolute left-3.5 top-3.5 text-muted"></i>
+            <input type="email" id="signin-email" required placeholder="you@example.com" class="vg-input pl-10" />
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-muted mb-1.5">Password</label>
+          <div class="relative">
+            <i class="fa-solid fa-lock absolute left-3.5 top-3.5 text-muted"></i>
+            <input type="password" id="signin-password" required placeholder="••••••••" class="vg-input pl-10" />
+          </div>
+        </div>
+        <div class="flex items-center justify-between text-xs">
+          <label class="flex items-center gap-2 cursor-pointer select-none">
+            <input type="checkbox" id="signin-remember" checked class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4" />
+            <span class="font-medium">Keep me signed in automatically</span>
+          </label>
+        </div>
+        <button type="submit" class="vg-btn-primary w-full py-3 rounded-xl font-semibold text-sm shadow-md flex items-center justify-center gap-2">
+          <span>Sign In to VaultGuard</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </form>
+
+      <!-- Sign Up Form -->
+      <form id="form-signup" onsubmit="handleSignUpStep1(event)" class="space-y-4 hidden">
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-muted mb-1.5">Email Address</label>
+          <div class="relative">
+            <i class="fa-regular fa-envelope absolute left-3.5 top-3.5 text-muted"></i>
+            <input type="email" id="signup-email" required placeholder="you@example.com" class="vg-input pl-10" />
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-muted mb-1.5">Create Password</label>
+          <div class="relative">
+            <i class="fa-solid fa-lock absolute left-3.5 top-3.5 text-muted"></i>
+            <input type="password" id="signup-password" required minlength="6" placeholder="Minimum 6 characters" class="vg-input pl-10" />
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-muted mb-1.5">Confirm Password</label>
+          <div class="relative">
+            <i class="fa-solid fa-shield-check absolute left-3.5 top-3.5 text-muted"></i>
+            <input type="password" id="signup-confirm" required minlength="6" placeholder="Re-enter password" class="vg-input pl-10" />
+          </div>
+        </div>
+        <div class="flex items-center gap-2 text-xs">
+          <input type="checkbox" id="signup-remember" checked class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4" />
+          <span class="font-medium">Save login session on this device</span>
+        </div>
+        <button type="submit" class="vg-btn-primary w-full py-3 rounded-xl font-semibold text-sm shadow-md flex items-center justify-center gap-2">
+          <span>Send Verification Code</span>
+          <i class="fa-solid fa-paper-plane"></i>
+        </button>
+      </form>
+
+      <!-- Email Verification Step -->
+      <form id="form-verify" onsubmit="handleVerifyEmail(event)" class="space-y-4 hidden">
+        <div class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs space-y-1">
+          <p class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-600"></i> Verification Code Sent!</p>
+          <p>We dispatched a 6-digit security code to <span id="verify-email-display" class="font-bold underline"></span>.</p>
+          <p class="text-[11px] bg-white/80 px-2 py-1 rounded border border-emerald-200 inline-block mt-1">
+            Simulated Inbox Code: <strong id="simulated-otp-code" class="font-mono text-sm tracking-widest text-emerald-700"></strong>
+          </p>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-muted mb-1.5">Enter 6-Digit Verification Code</label>
+          <input type="text" id="verify-code-input" maxlength="6" required placeholder="123456" class="vg-input text-center font-mono text-lg tracking-[0.4em]" />
+        </div>
+        <div class="flex gap-2">
+          <button type="button" onclick="cancelVerification()" class="w-1/3 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold hover:bg-slate-100">Back</button>
+          <button type="submit" class="vg-btn-primary w-2/3 py-2.5 rounded-xl font-semibold text-sm shadow-md">Verify & Continue</button>
+        </div>
+      </form>
+
+      <div class="mt-6 pt-4 border-t border-slate-200/70 text-center">
+        <p class="text-[11px] text-muted">
+          <i class="fa-solid fa-database mr-1"></i> 100% Local-First Encrypted Storage • Zero Auto-Generated Fake Data
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 2. PROFILE & FINANCIAL ONBOARDING WIZARD ==================== -->
+  <section id="view-onboarding" class="min-h-screen flex items-center justify-center p-4 sm:p-6 hidden">
+    <div class="vg-card w-full max-w-3xl p-6 sm:p-8 animate-fade-in">
+      <!-- Header & Step Indicator -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b" style="border-color: var(--border-color);">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-emerald-600">Financial Profile Setup</span>
+          <h2 class="text-2xl font-extrabold mt-0.5">Configure Your VaultGuard</h2>
+          <p class="text-xs text-muted mt-1">Enter your real income, must-spend obligations, and household details to calibrate your guardrails.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="loadSampleData(true)" class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-emerald-500/40 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition">
+            <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Quick Demo Fill
+          </button>
+          <button type="button" onclick="handleLogout()" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-muted hover:text-rose-600 transition" title="Sign Out">
+            <i class="fa-solid fa-right-from-bracket"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step Progress Pills -->
+      <div class="grid grid-cols-3 gap-2 my-6">
+        <div id="ob-step-pill-1" class="p-2.5 rounded-xl border-2 border-emerald-500 bg-emerald-50/50 text-xs font-bold flex items-center gap-2">
+          <span class="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[11px]">1</span>
+          <span>Personal & Income</span>
+        </div>
+        <div id="ob-step-pill-2" class="p-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-muted flex items-center gap-2">
+          <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center text-[11px]">2</span>
+          <span>Must-Spend & Family</span>
+        </div>
+        <div id="ob-step-pill-3" class="p-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-muted flex items-center gap-2">
+          <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center text-[11px]">3</span>
+          <span>AI Strategy Engine</span>
+        </div>
+      </div>
+
+      <!-- STEP 1: Personal Info, Currency & Primary Income -->
+      <div id="ob-step-1" class="space-y-5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-muted mb-1.5">Your Full Name *</label>
+            <input type="text" id="ob-name" placeholder="e.g., Aarav Sharma" class="vg-input" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-muted mb-1.5">Preferred Currency *</label>
+            <select id="ob-currency" onchange="updateOnboardingCurrencyLabels()" class="vg-input font-semibold">
+              <option value="USD">USD ($) — US Dollar</option>
+              <option value="EUR">EUR (€) — Euro</option>
+              <option value="NPR">NPR (Rs.) — Nepalese Rupee</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-muted mb-1.5">Your Monthly Net Income (<span class="ob-curr-sym">$</span>) *</label>
+            <input type="number" id="ob-income" min="0" step="any" placeholder="Enter your monthly take-home pay" class="vg-input font-semibold" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-muted mb-1.5">Current Total Savings (<span class="ob-curr-sym">$</span>)</label>
+            <input type="number" id="ob-savings" min="0" step="any" placeholder="0" class="vg-input" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-muted mb-1.5">Primary Financial Goal *</label>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            <label class="cursor-pointer">
+              <input type="radio" name="ob-goal" value="Emergency Fund" checked class="peer sr-only" />
+              <div class="p-3 rounded-xl border text-center peer-checked:border-emerald-600 peer-checked:bg-emerald-50/70 transition">
+                <i class="fa-solid fa-kit-medical text-emerald-600 text-lg mb-1"></i>
+                <p class="text-xs font-bold">Emergency Fund</p>
+              </div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="ob-goal" value="Big Purchase" class="peer sr-only" />
+              <div class="p-3 rounded-xl border text-center peer-checked:border-emerald-600 peer-checked:bg-emerald-50/70 transition">
+                <i class="fa-solid fa-house-chimney text-blue-600 text-lg mb-1"></i>
+                <p class="text-xs font-bold">Big Purchase</p>
+              </div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="ob-goal" value="Family Education" class="peer sr-only" />
+              <div class="p-3 rounded-xl border text-center peer-checked:border-emerald-600 peer-checked:bg-emerald-50/70 transition">
+                <i class="fa-solid fa-graduation-cap text-indigo-600 text-lg mb-1"></i>
+                <p class="text-xs font-bold">Family & Kids</p>
+              </div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="ob-goal" value="General Wealth" class="peer sr-only" />
+              <div class="p-3 rounded-xl border text-center peer-checked:border-emerald-600 peer-checked:bg-emerald-50/70 transition">
+                <i class="fa-solid fa-chart-line text-amber-600 text-lg mb-1"></i>
+                <p class="text-xs font-bold">Wealth Growth</p>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="flex justify-end pt-2">
+          <button type="button" onclick="goToOnboardingStep(2)" class="vg-btn-primary px-6 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2">
+            <span>Next: Must-Spend & Family</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Must-Spend Fixed Essentials & Family Members -->
+      <div id="ob-step-2" class="space-y-6 hidden">
+        <!-- Must-Spend Fixed Money Box -->
+        <div class="p-4 rounded-xl bg-soft border" style="border-color: var(--border-color);">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h3 class="text-sm font-bold flex items-center gap-2">
+                <i class="fa-solid fa-lock text-rose-500"></i> Must-Spend Fixed Money (Monthly Essentials)
+              </h3>
+              <p class="text-xs text-muted">Add non-negotiable fixed costs (Rent, Utilities, Groceries, School Fees, EMIs).</p>
+            </div>
+            <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-white border">
+              Total: <span id="ob-must-spend-total" class="text-rose-600">0</span>
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 mb-3">
+            <input type="text" id="ob-fixed-name" placeholder="Expense name (e.g., Apartment Rent)" class="vg-input sm:col-span-6 text-sm" />
+            <input type="number" id="ob-fixed-amount" min="0" step="any" placeholder="Amount" class="vg-input sm:col-span-4 text-sm" />
+            <button type="button" onclick="addOnboardingFixedItem()" class="vg-btn-primary sm:col-span-2 py-2.5 rounded-xl text-xs font-bold">
+              + Add
+            </button>
+          </div>
+
+          <div id="ob-fixed-list" class="space-y-1.5 max-h-36 overflow-y-auto">
+            <!-- Dynamic fixed items rendered here -->
+          </div>
+        </div>
+
+        <!-- Family Members Optional Setup -->
+        <div class="p-4 rounded-xl bg-soft border" style="border-color: var(--border-color);">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h3 class="text-sm font-bold flex items-center gap-2">
+                <i class="fa-solid fa-people-roof text-indigo-600"></i> Family & Household Members (Optional)
+              </h3>
+              <p class="text-xs text-muted">Include earning partners, students, or kids with their income & monthly allowance.</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 mb-3">
+            <input type="text" id="ob-fam-name" placeholder="Member Name" class="vg-input sm:col-span-3 text-sm" />
+            <select id="ob-fam-role" class="vg-input sm:col-span-3 text-sm">
+              <option value="Spouse / Partner">Spouse / Partner</option>
+              <option value="Student">Student</option>
+              <option value="Kid / Child">Kid / Child</option>
+              <option value="Parent / Dependent">Parent / Dependent</option>
+            </select>
+            <input type="number" id="ob-fam-income" min="0" step="any" placeholder="Monthly Income (0)" class="vg-input sm:col-span-2 text-sm" />
+            <input type="number" id="ob-fam-expense" min="0" step="any" placeholder="Allowance/Cost" class="vg-input sm:col-span-2 text-sm" />
+            <button type="button" onclick="addOnboardingFamilyMember()" class="vg-btn-primary sm:col-span-2 py-2.5 rounded-xl text-xs font-bold">
+              + Member
+            </button>
+          </div>
+
+          <div id="ob-family-list" class="space-y-1.5 max-h-36 overflow-y-auto">
+            <!-- Dynamic family members rendered here -->
+          </div>
+        </div>
+
+        <div class="flex justify-between pt-2">
+          <button type="button" onclick="goToOnboardingStep(1)" class="px-5 py-2.5 rounded-xl border text-xs font-semibold hover:bg-slate-100">
+            <i class="fa-solid fa-arrow-left mr-1"></i> Back
+          </button>
+          <button type="button" onclick="goToOnboardingStep(3)" class="vg-btn-primary px-6 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2">
+            <span>Analyze with AI Engine</span>
+            <i class="fa-solid fa-robot"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 3: AI Strategy Assessment & Split Customization -->
+      <div id="ob-step-3" class="space-y-5 hidden">
+        <div class="p-5 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-lg">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <span class="inline-block px-2.5 py-0.5 rounded-full bg-white/20 text-[11px] font-bold uppercase tracking-wider mb-2">
+                AI Financial Assessment
+              </span>
+              <h3 id="ai-rec-title" class="text-xl font-extrabold">Recommended Strategy: 50/30/20 Balanced</h3>
+              <p id="ai-rec-reason" class="text-xs text-emerald-50 mt-1 leading-relaxed"></p>
+            </div>
+            <div class="text-right shrink-0">
+              <p class="text-[11px] uppercase tracking-wider text-emerald-100">Household Income</p>
+              <p id="ai-rec-total-income" class="text-2xl font-extrabold">$0</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Strategy Ratio Customizer -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="p-4 rounded-xl border" style="border-color: var(--border-color);">
+            <div class="flex justify-between items-center mb-1">
+              <span class="text-xs font-bold text-rose-600">Must-Spend (Needs)</span>
+              <span id="split-needs-pct-label" class="text-sm font-extrabold">50%</span>
+            </div>
+            <input type="range" id="split-needs-slider" min="20" max="85" value="50" oninput="handleSplitSliderChange('needs')" class="w-full accent-rose-600" />
+            <p class="text-xs text-muted mt-1">Target: <strong id="split-needs-amt" class="text-slate-900">$0</strong></p>
+          </div>
+
+          <div class="p-4 rounded-xl border" style="border-color: var(--border-color);">
+            <div class="flex justify-between items-center mb-1">
+              <span class="text-xs font-bold text-amber-600">Flexible Wants</span>
+              <span id="split-wants-pct-label" class="text-sm font-extrabold">30%</span>
+            </div>
+            <input type="range" id="split-wants-slider" min="5" max="60" value="30" oninput="handleSplitSliderChange('wants')" class="w-full accent-amber-500" />
+            <p class="text-xs text-muted mt-1">Target: <strong id="split-wants-amt" class="text-slate-900">$0</strong></p>
+          </div>
+
+          <div class="p-4 rounded-xl border" style="border-color: var(--border-color);">
+            <div class="flex justify-between items-center mb-1">
+              <span class="text-xs font-bold text-emerald-600">Savings & Goals</span>
+              <span id="split-savings-pct-label" class="text-sm font-extrabold">20%</span>
+            </div>
+            <input type="range" id="split-savings-slider" min="5" max="65" value="20" oninput="handleSplitSliderChange('savings')" class="w-full accent-emerald-600" />
+            <p class="text-xs text-muted mt-1">Target: <strong id="split-savings-amt" class="text-slate-900">$0</strong></p>
+          </div>
+        </div>
+
+        <!-- AI Suggested Expense Breakdown Preview -->
+        <div class="p-4 rounded-xl bg-soft border" style="border-color: var(--border-color);">
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
+              <i class="fa-solid fa-sparkles text-emerald-600"></i> AI-Suggested Monthly Expense Plan
+            </h4>
+            <label class="flex items-center gap-2 text-xs font-semibold cursor-pointer">
+              <input type="checkbox" id="ob-auto-seed-essentials" checked class="rounded text-emerald-600 w-4 h-4" />
+              <span>Log Must-Spend items automatically</span>
+            </label>
+          </div>
+          <div id="ob-ai-breakdown-preview" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs"></div>
+        </div>
+
+        <div class="flex justify-between pt-2">
+          <button type="button" onclick="goToOnboardingStep(2)" class="px-5 py-2.5 rounded-xl border text-xs font-semibold hover:bg-slate-100">
+            <i class="fa-solid fa-arrow-left mr-1"></i> Back
+          </button>
+          <button type="button" onclick="completeOnboarding()" class="vg-btn-primary px-7 py-3 rounded-xl text-sm font-bold shadow-lg flex items-center gap-2">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>Launch My VaultGuard Dashboard</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 3. MAIN APPLICATION SHELL ==================== -->
+  <div id="view-app" class="hidden min-h-screen flex flex-col">
+    <!-- Top Navigation Header -->
+    <header class="vg-nav sticky top-0 z-30 border-b px-4 sm:px-6 py-3">
+      <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+        <!-- Logo & User Greeting -->
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-md">
+            <i class="fa-solid fa-shield-halved text-lg"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-display font-extrabold text-lg tracking-tight">VaultGuard</span>
+              <span id="header-goal-badge" class="hidden sm:inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                Emergency Fund
+              </span>
+            </div>
+            <p class="text-xs text-muted">Welcome back, <strong id="header-user-name">User</strong></p>
+          </div>
+        </div>
+
+        <!-- Desktop Navigation Tabs -->
+        <nav class="hidden md:flex items-center gap-1 p-1 rounded-xl bg-soft">
+          <button onclick="switchMainTab('dashboard')" id="nav-btn-dashboard" class="nav-tab-btn px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 bg-white text-slate-900 shadow-sm">
+            <i class="fa-solid fa-chart-pie"></i> Dashboard & Guardrails
+          </button>
+          <button onclick="switchMainTab('ai')" id="nav-btn-ai" class="nav-tab-btn px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 text-muted hover:text-slate-900">
+            <i class="fa-solid fa-robot"></i> AI Advisor & Planner
+          </button>
+          <button onclick="switchMainTab('family')" id="nav-btn-family" class="nav-tab-btn px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 text-muted hover:text-slate-900">
+            <i class="fa-solid fa-people-roof"></i> Family Hub
+          </button>
+          <button onclick="switchMainTab('settings')" id="nav-btn-settings" class="nav-tab-btn px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 text-muted hover:text-slate-900">
+            <i class="fa-solid fa-sliders"></i> Settings & Themes
+          </button>
+        </nav>
+
+        <!-- Right Quick Actions: Currency Switcher + Impulse Check Button -->
+        <div class="flex items-center gap-2">
+          <!-- Quick Currency Selector -->
+          <select id="header-currency-select" onchange="changeCurrency(this.value)" aria-label="Select Currency" class="vg-input !w-auto !py-1.5 !px-2.5 text-xs font-bold cursor-pointer">
+            <option value="USD">$ USD</option>
+            <option value="EUR">€ EUR</option>
+            <option value="NPR">Rs. NPR</option>
+          </select>
+
+          <!-- Impulse Purchase Friction Trigger -->
+          <button onclick="openImpulseModal()" class="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-sm flex items-center gap-1.5 transition">
+            <i class="fa-solid fa-hand-holding-dollar"></i>
+            <span class="hidden sm:inline">Can I Afford This?</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Navigation Bar -->
+      <nav class="flex md:hidden items-center justify-between gap-1 mt-3 pt-2 border-t overflow-x-auto" style="border-color: var(--border-color);">
+        <button onclick="switchMainTab('dashboard')" id="m-nav-btn-dashboard" class="flex-1 py-1.5 px-2 rounded-lg text-[11px] font-bold bg-emerald-600 text-white text-center whitespace-nowrap">
+          <i class="fa-solid fa-chart-pie block mb-0.5"></i> Dashboard
+        </button>
+        <button onclick="switchMainTab('ai')" id="m-nav-btn-ai" class="flex-1 py-1.5 px-2 rounded-lg text-[11px] font-bold text-muted text-center whitespace-nowrap">
+          <i class="fa-solid fa-robot block mb-0.5"></i> AI Advisor
+        </button>
+        <button onclick="switchMainTab('family')" id="m-nav-btn-family" class="flex-1 py-1.5 px-2 rounded-lg text-[11px] font-bold text-muted text-center whitespace-nowrap">
+          <i class="fa-solid fa-people-roof block mb-0.5"></i> Family
+        </button>
+        <button onclick="switchMainTab('settings')" id="m-nav-btn-settings" class="flex-1 py-1.5 px-2 rounded-lg text-[11px] font-bold text-muted text-center whitespace-nowrap">
+          <i class="fa-solid fa-sliders block mb-0.5"></i> Settings
+        </button>
+      </nav>
+    </header>
+
+    <!-- ==================== TAB 1: DASHBOARD & GUARDRAILS ==================== -->
+    <main id="tab-dashboard" class="max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6 flex-1 animate-fade-in">
+      <!-- Top 4 KPI Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- KPI 1: Total Household Budget -->
+        <div class="vg-card p-5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-muted">Household Monthly Budget</span>
+            <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+              <i class="fa-solid fa-wallet"></i>
+            </div>
+          </div>
+          <p id="kpi-total-budget" class="text-2xl font-extrabold mt-2">$0.00</p>
+          <p id="kpi-budget-sub" class="text-xs text-muted mt-1">Strategy: 50/30/20 Split</p>
+        </div>
+
+        <!-- KPI 2: Daily Safe-to-Spend -->
+        <div class="vg-card p-5 border-l-4 border-l-emerald-500">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-muted">Safe to Spend Today</span>
+            <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <i class="fa-solid fa-shield-check"></i>
+            </div>
+          </div>
+          <p id="kpi-safe-daily" class="text-2xl font-extrabold text-emerald-600 mt-2">$0.00</p>
+          <p id="kpi-safe-sub" class="text-xs text-muted mt-1">0 days left in month</p>
+        </div>
+
+        <!-- KPI 3: Total Saved This Month -->
+        <div class="vg-card p-5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-muted">Saved This Month</span>
+            <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+              <i class="fa-solid fa-piggy-bank"></i>
+            </div>
+          </div>
+          <p id="kpi-saved-month" class="text-2xl font-extrabold mt-2">$0.00</p>
+          <p id="kpi-saved-total" class="text-xs text-muted mt-1">Total Vault Reserve: $0</p>
+        </div>
+
+        <!-- KPI 4: Budget Health Score -->
+        <div class="vg-card p-5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-muted">Budget Health Score</span>
+            <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+              <i class="fa-solid fa-heart-pulse"></i>
+            </div>
+          </div>
+          <div class="flex items-baseline gap-2 mt-2">
+            <p id="kpi-health-score" class="text-2xl font-extrabold">100</p>
+            <span class="text-xs font-bold text-muted">/ 100</span>
+            <span id="kpi-health-badge" class="ml-auto text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Optimal</span>
+          </div>
+          <p class="text-xs text-muted mt-1">Real-time adherence rating</p>
+        </div>
+      </div>
+
+      <!-- Visual Threshold Guardrails & Must-Spend Vault -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Guardrail Progress Bars (2 columns) -->
+        <div class="vg-card p-5 sm:p-6 lg:col-span-2 space-y-5">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 class="text-base font-extrabold">Anti-Overspending Guardrails</h2>
+              <p class="text-xs text-muted">Color shifts automatically: Emerald (&lt;75%) → Amber (75–89%) → Crimson Lockout (90%+)</p>
+            </div>
+            <button onclick="openImpulseModal()" class="text-xs font-bold text-amber-600 hover:underline">
+              <i class="fa-solid fa-scale-balanced mr-1"></i> Test Impulse Purchase
+            </button>
+          </div>
+
+          <!-- Category 1: Must-Spend (Needs) -->
+          <div class="space-y-1.5">
+            <div class="flex justify-between text-xs font-bold">
+              <span class="flex items-center gap-1.5">
+                <i class="fa-solid fa-house-lock text-rose-500"></i> Must-Spend Essentials (Needs)
+              </span>
+              <span>
+                <span id="bar-needs-spent">$0</span> / <span id="bar-needs-limit">$0</span>
+                (<span id="bar-needs-pct">0%</span>)
+              </span>
+            </div>
+            <div class="w-full h-3 rounded-full bg-slate-200/80 overflow-hidden">
+              <div id="bar-needs-fill" class="h-full rounded-full bg-emerald-500 transition-all duration-500" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <!-- Category 2: Flexible Wants -->
+          <div class="space-y-1.5">
+            <div class="flex justify-between text-xs font-bold">
+              <span class="flex items-center gap-1.5">
+                <i class="fa-solid fa-bag-shopping text-amber-500"></i> Flexible Wants (Discretionary Guardrail)
+              </span>
+              <span>
+                <span id="bar-wants-spent">$0</span> / <span id="bar-wants-limit">$0</span>
+                (<span id="bar-wants-pct">0%</span>)
+              </span>
+            </div>
+            <div class="w-full h-3 rounded-full bg-slate-200/80 overflow-hidden">
+              <div id="bar-wants-fill" class="h-full rounded-full bg-emerald-500 transition-all duration-500" style="width: 0%"></div>
+            </div>
+            <p id="wants-guardrail-alert" class="text-[11px] font-semibold text-rose-600 hidden">
+              <i class="fa-solid fa-triangle-exclamation mr-1"></i> Warning: Discretionary guardrail threshold reached! Non-essential spending requires override confirmation.
+            </p>
+          </div>
+
+          <!-- Category 3: Savings Goal -->
+          <div class="space-y-1.5">
+            <div class="flex justify-between text-xs font-bold">
+              <span class="flex items-center gap-1.5">
+                <i class="fa-solid fa-vault text-emerald-600"></i> Monthly Savings Target (<span id="bar-goal-name">Goal</span>)
+              </span>
+              <span>
+                <span id="bar-savings-spent">$0</span> / <span id="bar-savings-limit">$0</span>
+                (<span id="bar-savings-pct">0%</span>)
+              </span>
+            </div>
+            <div class="w-full h-3 rounded-full bg-slate-200/80 overflow-hidden">
+              <div id="bar-savings-fill" class="h-full rounded-full bg-indigo-500 transition-all duration-500" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dedicated Must-Spend Money Locker & 24-Hr Cooling-Off Wishlist -->
+        <div class="vg-card p-5 sm:p-6 flex flex-col justify-between space-y-4">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-sm font-extrabold flex items-center gap-2">
+                <i class="fa-solid fa-snowflake text-sky-500"></i> 24-Hr Cooling-Off Wishlist
+              </h3>
+              <span id="wishlist-count-badge" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-sky-100 text-sky-800">0 items</span>
+            </div>
+            <p class="text-xs text-muted mb-3">Tempting impulse items parked here for 24 hours before buying.</p>
+            <div id="wishlist-container" class="space-y-2 max-h-40 overflow-y-auto pr-1">
+              <p class="text-xs text-muted italic py-4 text-center">No impulse items parked yet. Use "Can I Afford This?" to test purchases.</p>
+            </div>
+          </div>
+
+          <div class="pt-3 border-t" style="border-color: var(--border-color);">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-semibold text-muted">Locked Must-Spend Reserve:</span>
+              <span id="locked-must-spend-display" class="font-extrabold text-rose-600">$0.00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Section -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="vg-card p-5 sm:p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="text-sm font-extrabold">Actual vs. Target Budget Allocation</h3>
+              <p class="text-xs text-muted">Comparison of current spending across categories</p>
+            </div>
+          </div>
+          <div class="relative h-64 w-full">
+            <canvas id="chart-allocation"></canvas>
+          </div>
+        </div>
+
+        <div class="vg-card p-5 sm:p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="text-sm font-extrabold">Daily Spending vs. Safe-to-Spend Limit</h3>
+              <p class="text-xs text-muted">Last 7 days discretionary spend against your daily guardrail</p>
+            </div>
+          </div>
+          <div class="relative h-64 w-full">
+            <canvas id="chart-daily"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick-Add Transaction & Filterable Transaction History -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Quick-Add Form -->
+        <div class="vg-card p-5 sm:p-6 h-fit">
+          <h3 class="text-base font-extrabold mb-1">Log Expense or Savings</h3>
+          <p class="text-xs text-muted mb-4">Guardrails automatically validate non-essential purchases.</p>
+
+          <form id="form-add-tx" onsubmit="handleAddTransaction(event)" class="space-y-3.5">
+            <div>
+              <label class="block text-xs font-semibold text-muted mb-1">Amount (<span class="active-curr-sym">$</span>)</label>
+              <input type="number" id="tx-amount" min="0.01" step="any" required placeholder="0.00" class="vg-input font-bold text-base" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-muted mb-1">Description</label>
+              <input type="text" id="tx-desc" required placeholder="e.g., Grocery run, Coffee, Emergency Deposit" class="vg-input text-sm" />
+            </div>
+
+            <div class="grid grid-cols-2 gap-2.5">
+              <div>
+                <label class="block text-xs font-semibold text-muted mb-1">Category</label>
+                <select id="tx-category" class="vg-input text-xs font-semibold">
+                  <option value="Wants">Flexible Wants</option>
+                  <option value="Needs">Must-Spend (Needs)</option>
+                  <option value="Savings">Savings Transfer</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-muted mb-1">Family Member</label>
+                <select id="tx-member" class="vg-input text-xs font-semibold">
+                  <!-- Populated dynamically -->
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-muted mb-1">Date</label>
+              <input type="date" id="tx-date" required class="vg-input text-xs" />
+            </div>
+
+            <button type="submit" class="vg-btn-primary w-full py-3 rounded-xl text-xs font-bold uppercase tracking-wider shadow-md flex items-center justify-center gap-2">
+              <i class="fa-solid fa-plus"></i> Record Transaction
+            </button>
+          </form>
+        </div>
+
+        <!-- Filterable Transaction History Log -->
+        <div class="vg-card p-5 sm:p-6 lg:col-span-2 flex flex-col">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+            <div>
+              <h3 class="text-base font-extrabold">Transaction Ledger</h3>
+              <p class="text-xs text-muted">Filter by category or family member; delete entries to recalculate instantly.</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <select id="filter-category" onchange="renderTransactions()" class="vg-input !w-auto !py-1.5 !px-3 text-xs font-semibold">
+                <option value="ALL">All Categories</option>
+                <option value="Needs">Must-Spend (Needs)</option>
+                <option value="Wants">Flexible Wants</option>
+                <option value="Savings">Savings Transfers</option>
+              </select>
+              <select id="filter-member" onchange="renderTransactions()" class="vg-input !w-auto !py-1.5 !px-3 text-xs font-semibold">
+                <option value="ALL">All Members</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto flex-1">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b text-[11px] uppercase tracking-wider text-muted" style="border-color: var(--border-color);">
+                  <th class="py-2.5 px-2">Date</th>
+                  <th class="py-2.5 px-2">Description</th>
+                  <th class="py-2.5 px-2">Member</th>
+                  <th class="py-2.5 px-2">Category</th>
+                  <th class="py-2.5 px-2 text-right">Amount</th>
+                  <th class="py-2.5 px-2 text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody id="tx-table-body" class="divide-y text-xs" style="border-color: var(--border-color);">
+                <!-- Rows rendered dynamically -->
+              </tbody>
+            </table>
+            <div id="tx-empty-state" class="text-center py-10 hidden">
+              <i class="fa-solid fa-receipt text-3xl text-muted/40 mb-2"></i>
+              <p class="text-xs text-muted font-medium">No transactions recorded matching your filter.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ==================== TAB 2: AI FINANCIAL ADVISOR & AUTO-PLANNER ==================== -->
+    <main id="tab-ai" class="max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6 flex-1 hidden animate-fade-in">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Left: AI Auto-Allocate Expense Engine (5 cols) -->
+        <div class="vg-card p-5 sm:p-6 lg:col-span-5 space-y-4 h-fit">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </div>
+            <div>
+              <h2 class="text-base font-extrabold">AI Auto-Allocate Planner</h2>
+              <p class="text-xs text-muted">Let AI distribute your post-essential money into smart buckets.</p>
+            </div>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-soft text-xs space-y-1.5">
+            <div class="flex justify-between">
+              <span class="text-muted">Total Household Income:</span>
+              <strong id="ai-planner-income">$0</strong>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-muted">Locked Must-Spend Money:</span>
+              <strong id="ai-planner-must" class="text-rose-600">$0</strong>
+            </div>
+            <div class="flex justify-between border-t pt-1.5" style="border-color: var(--border-color);">
+              <span class="font-bold">AI Allocatable Surplus:</span>
+              <strong id="ai-planner-surplus" class="text-emerald-600">$0</strong>
+            </div>
+          </div>
+
+          <button onclick="generateAIExpensePlan()" id="btn-ai-allocate" class="vg-btn-primary w-full py-3 rounded-xl text-xs font-bold uppercase tracking-wider shadow-md flex items-center justify-center gap-2">
+            <i class="fa-solid fa-microchip"></i> Generate Optimal Expense Plan
+          </button>
+
+          <div id="ai-expense-plan-output" class="space-y-2.5 pt-2">
+            <!-- AI generated itemized expense breakdown rendered here -->
+          </div>
+        </div>
+
+        <!-- Right: Interactive AI Financial Coach Chat & Calculator (7 cols) -->
+        <div class="vg-card p-5 sm:p-6 lg:col-span-7 flex flex-col h-[600px]">
+          <div class="flex items-center justify-between pb-3 border-b" style="border-color: var(--border-color);">
+            <div class="flex items-center gap-2.5">
+              <div class="w-9 h-9 rounded-full bg-indigo-600 text-white flex items-center justify-center">
+                <i class="fa-solid fa-robot"></i>
+              </div>
+              <div>
+                <h3 class="text-sm font-extrabold">VaultGuard AI Financial Strategist</h3>
+                <p class="text-[11px] text-emerald-600 font-semibold flex items-center gap-1">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span> Connected to your live household ledger
+                </p>
+              </div>
+            </div>
+            <button onclick="clearAIChat()" class="text-xs text-muted hover:text-rose-600 font-semibold">Clear Chat</button>
+          </div>
+
+          <!-- Quick Prompt Chips -->
+          <div class="flex gap-2 overflow-x-auto py-3 shrink-0">
+            <button onclick="askQuickPrompt('How can our household save 20% more each month?')" class="px-3 py-1.5 rounded-full bg-soft hover:bg-emerald-100 text-[11px] font-semibold whitespace-nowrap transition">
+              💡 How to save 20% more?
+            </button>
+            <button onclick="askQuickPrompt('Analyze my current spending and tell me where I am overspending.')" class="px-3 py-1.5 rounded-full bg-soft hover:bg-emerald-100 text-[11px] font-semibold whitespace-nowrap transition">
+              📊 Audit my spending
+            </button>
+            <button onclick="askQuickPrompt('How long until we reach 6 months of Emergency Fund?')" class="px-3 py-1.5 rounded-full bg-soft hover:bg-emerald-100 text-[11px] font-semibold whitespace-nowrap transition">
+              🛡️ Emergency fund timeline
+            </button>
+            <button onclick="askQuickPrompt('Suggest kid & student allowance limits based on our income.')" class="px-3 py-1.5 rounded-full bg-soft hover:bg-emerald-100 text-[11px] font-semibold whitespace-nowrap transition">
+              👨‍👩‍👧‍👦 Family allowance check
+            </button>
+          </div>
+
+          <!-- Chat Messages Feed -->
+          <div id="ai-chat-messages" class="flex-1 overflow-y-auto space-y-3 pr-2 py-2">
+            <div class="flex gap-2.5 items-start">
+              <div class="w-7 h-7 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs shrink-0 mt-0.5">
+                <i class="fa-solid fa-robot"></i>
+              </div>
+              <div class="p-3.5 rounded-2xl rounded-tl-none bg-soft text-xs leading-relaxed max-w-[85%]">
+                Hello! I am your <strong>VaultGuard AI Financial Advisor</strong>. I have real-time visibility into your household income, locked must-spend bills, family member allowances, and daily safe-to-spend limits. Ask me any budgeting question or scenario calculation!
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat Input Form -->
+          <form onsubmit="handleAIChatSubmit(event)" class="pt-3 border-t flex gap-2" style="border-color: var(--border-color);">
+            <input type="text" id="ai-chat-input" required placeholder="Ask about your budget, savings goals, or big purchases..." class="vg-input text-xs" />
+            <button type="submit" id="ai-chat-send-btn" class="vg-btn-primary px-5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shrink-0">
+              <span>Ask AI</span>
+              <i class="fa-solid fa-paper-plane"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <!-- ==================== TAB 3: FAMILY HUB ==================== -->
+    <main id="tab-family" class="max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6 flex-1 hidden animate-fade-in">
+      <!-- Household Summary Banner -->
+      <div class="vg-card p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-indigo-600">Family & Household Edition</span>
+          <h2 class="text-xl font-extrabold mt-0.5">Household Income & Member Allowance Hub</h2>
+          <p class="text-xs text-muted mt-1">Track combined salaries, student stipends, and kid expenses in one unified guardrail.</p>
+        </div>
+        <div class="flex flex-wrap gap-4">
+          <div class="px-4 py-2.5 rounded-xl bg-soft">
+            <p class="text-[11px] text-muted font-semibold">Combined Family Income</p>
+            <p id="fam-total-income" class="text-lg font-extrabold text-emerald-600">$0.00</p>
+          </div>
+          <div class="px-4 py-2.5 rounded-xl bg-soft">
+            <p class="text-[11px] text-muted font-semibold">Member Fixed Allowances</p>
+            <p id="fam-total-allowances" class="text-lg font-extrabold text-rose-600">$0.00</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Add Family Member Form -->
+        <div class="vg-card p-5 sm:p-6 h-fit">
+          <h3 class="text-base font-extrabold mb-1">Add Family Member</h3>
+          <p class="text-xs text-muted mb-4">Add a spouse, student, child, or dependent to your household plan.</p>
+
+          <form onsubmit="handleAddFamilyMemberTab(event)" class="space-y-3.5">
+            <div>
+              <label class="block text-xs font-semibold text-muted mb-1">Member Name *</label>
+              <input type="text" id="fam-new-name" required placeholder="e.g., Maya (Daughter)" class="vg-input text-sm" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-muted mb-1">Role / Occupation *</label>
+              <select id="fam-new-role" class="vg-input text-xs font-semibold">
+                <option value="Spouse / Partner">Spouse / Partner</option>
+                <option value="Student">Student (School / College)</option>
+                <option value="Kid / Child">Kid / Child</option>
+                <option value="Working Adult">Working Adult</option>
+                <option value="Parent / Senior">Parent / Senior</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-muted mb-1">Monthly Income Contribution (<span class="active-curr-sym">$</span>)</label>
+              <input type="number" id="fam-new-income" min="0" step="any" value="0" class="vg-input text-sm" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-muted mb-1">Monthly Allowance / Fixed Expense (<span class="active-curr-sym">$</span>)</label>
+              <input type="number" id="fam-new-allowance" min="0" step="any" value="0" class="vg-input text-sm" />
+            </div>
+            <button type="submit" class="vg-btn-primary w-full py-3 rounded-xl text-xs font-bold uppercase tracking-wider shadow-md">
+              <i class="fa-solid fa-user-plus mr-1"></i> Add to Household
+            </button>
+          </form>
+        </div>
+
+        <!-- Family Members Grid -->
+        <div id="family-members-grid" class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 h-fit">
+          <!-- Member cards rendered dynamically -->
+        </div>
+      </div>
+    </main>
+
+    <!-- ==================== TAB 4: SETTINGS, MUST-SPEND & THEMES ==================== -->
+    <main id="tab-settings" class="max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6 flex-1 hidden animate-fade-in">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Left Column: Profile, Currency & Must-Spend Editor -->
+        <div class="space-y-6">
+          <!-- Profile & Currency Settings -->
+          <div class="vg-card p-5 sm:p-6 space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="text-base font-extrabold">Profile, Currency & Income</h3>
+              <button onclick="loadSampleData(false)" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100">
+                <i class="fa-solid fa-database mr-1"></i> Load Sample Data
+              </button>
+            </div>
+
+            <form onsubmit="handleSaveProfileSettings(event)" class="space-y-3.5">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-semibold text-muted mb-1">Display Name</label>
+                  <input type="text" id="set-name" required class="vg-input text-sm" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-muted mb-1">Active Currency</label>
+                  <select id="set-currency" class="vg-input text-sm font-bold">
+                    <option value="USD">USD ($) — US Dollar</option>
+                    <option value="EUR">EUR (€) — Euro</option>
+                    <option value="NPR">NPR (Rs.) — Nepalese Rupee</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-semibold text-muted mb-1">Primary Monthly Income (<span class="active-curr-sym">$</span>)</label>
+                  <input type="number" id="set-income" min="0" step="any" required class="vg-input text-sm font-semibold" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-muted mb-1">Total Vault Savings (<span class="active-curr-sym">$</span>)</label>
+                  <input type="number" id="set-savings" min="0" step="any" required class="vg-input text-sm" />
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-muted mb-1">Primary Financial Goal</label>
+                <select id="set-goal" class="vg-input text-sm">
+                  <option value="Emergency Fund">Emergency Fund</option>
+                  <option value="Big Purchase">Big Purchase</option>
+                  <option value="Family Education">Family Education</option>
+                  <option value="General Wealth">General Wealth</option>
+                </select>
+              </div>
+
+              <!-- Custom Budget Split Percentages -->
+              <div class="p-3.5 rounded-xl bg-soft space-y-2">
+                <p class="text-xs font-bold">Budget Rule Split (Must sum to 100%)</p>
+                <div class="grid grid-cols-3 gap-2">
+                  <div>
+                    <label class="text-[11px] text-muted font-semibold">Needs %</label>
+                    <input type="number" id="set-pct-needs" min="10" max="90" class="vg-input text-xs font-bold" />
+                  </div>
+                  <div>
+                    <label class="text-[11px] text-muted font-semibold">Wants %</label>
+                    <input type="number" id="set-pct-wants" min="5" max="70" class="vg-input text-xs font-bold" />
+                  </div>
+                  <div>
+                    <label class="text-[11px] text-muted font-semibold">Savings %</label>
+                    <input type="number" id="set-pct-savings" min="5" max="70" class="vg-input text-xs font-bold" />
+                  </div>
+                </div>
+              </div>
+
+              <button type="submit" class="vg-btn-primary w-full py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider">
+                Save Financial Settings
+              </button>
+            </form>
+          </div>
+
+          <!-- Must-Spend Fixed Essentials Manager -->
+          <div class="vg-card p-5 sm:p-6 space-y-3">
+            <h3 class="text-base font-extrabold flex items-center gap-2">
+              <i class="fa-solid fa-lock text-rose-500"></i> Must-Spend Fixed Essentials Manager
+            </h3>
+            <p class="text-xs text-muted">Mandatory monthly commitments protected from discretionary spending.</p>
+
+            <div class="flex gap-2">
+              <input type="text" id="set-fixed-name" placeholder="Item (e.g., Rent, Internet)" class="vg-input text-xs" />
+              <input type="number" id="set-fixed-amount" min="0" step="any" placeholder="Amount" class="vg-input w-32 text-xs" />
+              <button type="button" onclick="addSettingsFixedItem()" class="vg-btn-primary px-4 rounded-xl text-xs font-bold shrink-0">Add</button>
+            </div>
+
+            <div id="set-fixed-list" class="space-y-2 max-h-48 overflow-y-auto pt-1"></div>
+          </div>
+        </div>
+
+        <!-- Right Column: Colorful Themes, Custom Image Background & Account Session -->
+        <div class="space-y-6">
+          <!-- Theme & Custom Wallpaper Studio -->
+          <div class="vg-card p-5 sm:p-6 space-y-5">
+            <div>
+              <h3 class="text-base font-extrabold flex items-center gap-2">
+                <i class="fa-solid fa-palette text-indigo-600"></i> Colorful Themes & Wallpaper Studio
+              </h3>
+              <p class="text-xs text-muted">Personalize your financial workspace with vibrant color palettes or your own background photo.</p>
+            </div>
+
+            <!-- Preset Color Swatches -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+              <button type="button" onclick="applyTheme('slate')" class="p-3 rounded-xl border text-left hover:border-slate-900 transition flex items-center gap-2.5 bg-slate-50 text-slate-900">
+                <span class="w-5 h-5 rounded-full bg-slate-900 shrink-0"></span>
+                <span class="text-xs font-bold">Fintech Slate</span>
+              </button>
+              <button type="button" onclick="applyTheme('emerald')" class="p-3 rounded-xl border text-left hover:border-emerald-600 transition flex items-center gap-2.5 bg-emerald-50 text-emerald-950">
+                <span class="w-5 h-5 rounded-full bg-emerald-600 shrink-0"></span>
+                <span class="text-xs font-bold">Emerald Mint</span>
+              </button>
+              <button type="button" onclick="applyTheme('indigo')" class="p-3 rounded-xl border text-left hover:border-indigo-600 transition flex items-center gap-2.5 bg-indigo-50 text-indigo-950">
+                <span class="w-5 h-5 rounded-full bg-indigo-600 shrink-0"></span>
+                <span class="text-xs font-bold">Royal Indigo</span>
+              </button>
+              <button type="button" onclick="applyTheme('coral')" class="p-3 rounded-xl border text-left hover:border-rose-600 transition flex items-center gap-2.5 bg-rose-50 text-rose-950">
+                <span class="w-5 h-5 rounded-full bg-rose-600 shrink-0"></span>
+                <span class="text-xs font-bold">Sunset Coral</span>
+              </button>
+              <button type="button" onclick="applyTheme('midnight')" class="p-3 rounded-xl border text-left hover:border-emerald-400 transition flex items-center gap-2.5 bg-slate-900 text-white">
+                <span class="w-5 h-5 rounded-full bg-emerald-400 shrink-0"></span>
+                <span class="text-xs font-bold">Midnight Neon</span>
+              </button>
+            </div>
+
+            <!-- Custom Image Theme Upload / URL -->
+            <div class="p-4 rounded-xl bg-soft border space-y-3" style="border-color: var(--border-color);">
+              <h4 class="text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-regular fa-image text-emerald-600"></i> Custom Background Image Theme
+              </h4>
+              <p class="text-[11px] text-muted">Upload an image from your device or paste an image URL to activate translucent glassmorphism cards.</p>
+
+              <!-- File Upload -->
+              <div>
+                <label class="block text-[11px] font-semibold mb-1">Upload Image File (JPG, PNG, WebP)</label>
+                <input type="file" id="bg-image-upload" accept="image/*" onchange="handleBgImageUpload(event)" class="text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 cursor-pointer" />
+              </div>
+
+              <!-- Image URL Input -->
+              <div class="flex gap-2">
+                <input type="url" id="bg-image-url" placeholder="Or paste https://... image URL" class="vg-input text-xs" />
+                <button type="button" onclick="applyCustomBgUrl()" class="vg-btn-primary px-4 rounded-xl text-xs font-bold shrink-0">Apply</button>
+              </div>
+
+              <!-- Curated Scenic Presets -->
+              <div class="flex flex-wrap items-center gap-2 pt-1">
+                <span class="text-[11px] text-muted font-semibold">Quick Scenic:</span>
+                <button type="button" onclick="setCustomBg('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1920&q=80')" class="text-[11px] px-2.5 py-1 rounded-md bg-white border font-semibold hover:bg-slate-50 text-slate-800">Yosemite Valley</button>
+                <button type="button" onclick="setCustomBg('https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1920&q=80')" class="text-[11px] px-2.5 py-1 rounded-md bg-white border font-semibold hover:bg-slate-50 text-slate-800">Himalayas Peak</button>
+                <button type="button" onclick="clearCustomBg()" class="text-[11px] px-2.5 py-1 rounded-md bg-rose-50 text-rose-700 border border-rose-200 font-semibold hover:bg-rose-100">Remove Image</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Account & Session Security -->
+          <div class="vg-card p-5 sm:p-6 space-y-4">
+            <h3 class="text-base font-extrabold">Account & Persistent Session</h3>
+            <div class="p-3.5 rounded-xl bg-soft flex items-center justify-between text-xs">
+              <div>
+                <p class="font-bold" id="set-account-email">user@example.com</p>
+                <p class="text-[11px] text-emerald-600 font-semibold mt-0.5">
+                  <i class="fa-solid fa-circle-check mr-1"></i> Verified Account • Auto-Login Saved in Browser
+                </p>
+              </div>
+              <button type="button" onclick="handleLogout()" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-sm transition">
+                <i class="fa-solid fa-right-from-bracket mr-1"></i> Log Out
+              </button>
+            </div>
+
+            <div class="pt-2 border-t flex justify-between items-center" style="border-color: var(--border-color);">
+              <span class="text-xs text-muted">Want to reset all transactions and start fresh?</span>
+              <button type="button" onclick="openResetConfirmModal()" class="text-xs font-bold text-rose-600 hover:underline">Reset Financial Data</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ==================== MODAL 1: IMPULSE PURCHASE FRICTION ("CAN I AFFORD THIS?") ==================== -->
+  <div id="modal-impulse" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="vg-card w-full max-w-md p-6 animate-fade-in space-y-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center">
+            <i class="fa-solid fa-scale-balanced"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-extrabold">Can I Afford This?</h3>
+            <p class="text-[11px] text-muted">Real-time impulse guardrail simulator</p>
+          </div>
+        </div>
+        <button onclick="closeImpulseModal()" class="text-muted hover:text-slate-900 p-1">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-muted mb-1">What are you thinking of buying?</label>
+          <input type="text" id="imp-item-name" oninput="evaluateImpulsePurchase()" placeholder="e.g., Noise-Cancelling Headphones" class="vg-input text-sm" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-muted mb-1">Price (<span class="active-curr-sym">$</span>)</label>
+          <input type="number" id="imp-item-price" min="0" step="any" oninput="evaluateImpulsePurchase()" placeholder="0.00" class="vg-input text-base font-bold" />
+        </div>
+      </div>
+
+      <!-- Dynamic Impact Result Box -->
+      <div id="imp-result-box" class="p-4 rounded-xl bg-soft border text-xs space-y-2 hidden" style="border-color: var(--border-color);">
+        <p id="imp-verdict-title" class="font-extrabold text-sm"></p>
+        <p id="imp-verdict-desc" class="leading-relaxed"></p>
+        <div class="grid grid-cols-2 gap-2 pt-2 border-t" style="border-color: var(--border-color);">
+          <div>
+            <span class="text-[10px] uppercase text-muted block">New Daily Safe Limit</span>
+            <strong id="imp-new-daily" class="text-sm">$0.00</strong>
+          </div>
+          <div>
+            <span class="text-[10px] uppercase text-muted block">Savings Goal Delay</span>
+            <strong id="imp-goal-delay" class="text-sm">0 days</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-2 pt-2">
+        <button type="button" onclick="parkInCoolingWishlist()" class="flex-1 py-2.5 px-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition">
+          <i class="fa-solid fa-snowflake"></i> Park in 24-Hr Wishlist
+        </button>
+        <button type="button" onclick="buyImpulseItemNow()" class="flex-1 py-2.5 px-3 rounded-xl border text-xs font-bold hover:bg-slate-100 transition">
+          Log Purchase Anyway
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 2: GUARDRAIL OVERRIDE / CONFIRMATION DIALOG ==================== -->
+  <div id="modal-confirm" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="vg-card w-full max-w-sm p-6 animate-fade-in space-y-4">
+      <div class="flex items-center gap-3 text-rose-600">
+        <div class="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center shrink-0">
+          <i class="fa-solid fa-triangle-exclamation text-lg"></i>
+        </div>
+        <h3 id="confirm-modal-title" class="text-base font-extrabold">Guardrail Warning</h3>
+      </div>
+      <p id="confirm-modal-msg" class="text-xs leading-relaxed text-muted"></p>
+      <div class="flex justify-end gap-2 pt-2">
+        <button type="button" onclick="closeConfirmModal()" class="px-4 py-2 rounded-xl border text-xs font-bold hover:bg-slate-100">Cancel</button>
+        <button type="button" id="confirm-modal-yes-btn" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold">Confirm Override</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== JAVASCRIPT APPLICATION ENGINE ==================== -->
+  <script>
+    // =========================================================================
+    // 1. STATE MANAGEMENT & CONSTANTS
+    // =========================================================================
+    const STORAGE_KEYS = {
+      USERS: 'vg_users_db_v1',
+      SESSION: 'vg_active_session_v1'
+    };
+
+    // Currency Metadata & Conversion Rates (Base: USD)
+    const CURRENCIES = {
+      USD: { symbol: '$', code: 'USD', rate: 1, decimals: 2 },
+      EUR: { symbol: '€', code: 'EUR', rate: 0.92, decimals: 2 },
+      NPR: { symbol: 'Rs. ', code: 'NPR', rate: 135.5, decimals: 0 }
+    };
+
+    let currentUserEmail = null;
+    let pendingSignupData = null;
+    let allocationChartInstance = null;
+    let dailyChartInstance = null;
+
+    // Temporary onboarding state before saving
+    let obState = {
+      fixedItems: [],
+      familyMembers: []
+    };
+
+    // Default user data blueprint (clean, zero pre-filled dummy values)
+    function createEmptyUserProfile(email, password) {
+      return {
+        email,
+        password,
+        verified: true,
+        onboarded: false,
+        profile: {
+          name: '',
+          currency: 'USD',
+          monthlyIncome: 0,
+          currentSavings: 0,
+          goal: 'Emergency Fund',
+          split: { needs: 50, wants: 30, savings: 20 }
+        },
+        mustSpendItems: [], // { id, name, amount }
+        familyMembers: [],  // { id, name, role, income, allowance }
+        transactions: [],   // { id, amount, desc, category, member, date }
+        wishlist: [],       // { id, name, price, addedAt }
+        settings: {
+          theme: 'slate',
+          customBg: ''
+        }
+      };
+    }
+
+    // =========================================================================
+    // 2. INITIALIZATION & SESSION PERSISTENCE
+    // =========================================================================
+    window.onload = function () {
+      // Set default date input to today
+      const todayStr = new Date().toISOString().split('T')[0];
+      const txDateEl = document.getElementById('tx-date');
+      if (txDateEl) txDateEl.value = todayStr;
+
+      // Check persistent login session in localStorage
+      const savedSession = JSON.parse(localStorage.getItem(STORAGE_KEYS.SESSION) || 'null');
+      const usersDb = getUsersDb();
+
+      if (savedSession && savedSession.email && usersDb[savedSession.email]) {
+        currentUserEmail = savedSession.email;
+        const userRecord = usersDb[currentUserEmail];
+        applyTheme(userRecord.settings?.theme || 'slate', false);
+        if (userRecord.settings?.customBg) {
+          setCustomBg(userRecord.settings.customBg, false);
+        }
+
+        if (userRecord.onboarded) {
+          showAppView();
+        } else {
+          showOnboardingView();
+        }
+      } else {
+        showAuthView();
+      }
+    };
+
+    function getUsersDb() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS) || '{}');
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function saveUsersDb(db) {
+      localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(db));
+    }
+
+    function getCurrentUser() {
+      if (!currentUserEmail) return null;
+      const db = getUsersDb();
+      return db[currentUserEmail] || null;
+    }
+
+    function updateCurrentUser(updaterFn) {
+      if (!currentUserEmail) return;
+      const db = getUsersDb();
+      if (!db[currentUserEmail]) return;
+      updaterFn(db[currentUserEmail]);
+      saveUsersDb(db);
+    }
+
+    // =========================================================================
+    // 3. AUTHENTICATION & EMAIL VERIFICATION FLOW
+    // =========================================================================
+    function switchAuthMode(mode) {
+      const signinForm = document.getElementById('form-signin');
+      const signupForm = document.getElementById('form-signup');
+      const verifyForm = document.getElementById('form-verify');
+      const tabSignin = document.getElementById('tab-signin');
+      const tabSignup = document.getElementById('tab-signup');
+
+      verifyForm.classList.add('hidden');
+      document.getElementById('auth-tabs').classList.remove('hidden');
+
+      if (mode === 'signin') {
+        signinForm.classList.remove('hidden');
+        signupForm.classList.add('hidden');
+        tabSignin.classList.add('bg-white', 'text-slate-900', 'shadow-sm');
+        tabSignin.classList.remove('text-muted');
+        tabSignup.classList.remove('bg-white', 'text-slate-900', 'shadow-sm');
+        tabSignup.classList.add('text-muted');
+      } else {
+        signinForm.classList.add('hidden');
+        signupForm.classList.remove('hidden');
+        tabSignup.classList.add('bg-white', 'text-slate-900', 'shadow-sm');
+        tabSignup.classList.remove('text-muted');
+        tabSignin.classList.remove('bg-white', 'text-slate-900', 'shadow-sm');
+        tabSignin.classList.add('text-muted');
+      }
+    }
+
+    function handleSignUpStep1(e) {
+      e.preventDefault();
+      const email = document.getElementById('signup-email').value.trim().toLowerCase();
+      const password = document.getElementById('signup-password').value;
+      const confirm = document.getElementById('signup-confirm').value;
+      const remember = document.getElementById('signup-remember').checked;
+
+      if (password !== confirm) {
+        showToast('Passwords do not match.', 'error');
+        return;
+      }
+
+      const db = getUsersDb();
+      if (db[email]) {
+        showToast('An account with this email already exists. Please Sign In.', 'error');
+        switchAuthMode('signin');
+        document.getElementById('signin-email').value = email;
+        return;
+      }
+
+      // Generate 6-digit OTP code
+      const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+      pendingSignupData = { email, password, remember, otpCode };
+
+      document.getElementById('auth-tabs').classList.add('hidden');
+      document.getElementById('form-signup').classList.add('hidden');
+      document.getElementById('form-verify').classList.remove('hidden');
+      document.getElementById('verify-email-display').textContent = email;
+      document.getElementById('simulated-otp-code').textContent = otpCode;
+      document.getElementById('verify-code-input').value = '';
+      showToast('Verification code generated! Check the prompt box.', 'info');
+    }
+
+    function cancelVerification() {
+      pendingSignupData = null;
+      switchAuthMode('signup');
+    }
+
+    function handleVerifyEmail(e) {
+      e.preventDefault();
+      if (!pendingSignupData) return;
+      const entered = document.getElementById('verify-code-input').value.trim();
+
+      if (entered !== pendingSignupData.otpCode) {
+        showToast('Invalid verification code. Please check and try again.', 'error');
+        return;
+      }
+
+      const db = getUsersDb();
+      db[pendingSignupData.email] = createEmptyUserProfile(pendingSignupData.email, pendingSignupData.password);
+      saveUsersDb(db);
+
+      currentUserEmail = pendingSignupData.email;
+      if (pendingSignupData.remember) {
+        localStorage.setItem(STORAGE_KEYS.SESSION, JSON.stringify({ email: currentUserEmail, loggedInAt: Date.now() }));
+      }
+      pendingSignupData = null;
+
+      showToast('Email verified! Let’s set up your financial profile.', 'success');
+      showOnboardingView();
+    }
+
+    function handleSignIn(e) {
+      e.preventDefault();
+      const email = document.getElementById('signin-email').value.trim().toLowerCase();
+      const password = document.getElementById('signin-password').value;
+      const remember = document.getElementById('signin-remember').checked;
+
+      const db = getUsersDb();
+      const user = db[email];
+
+      if (!user || user.password !== password) {
+        showToast('Invalid email or password. Create an account if you are new.', 'error');
+        return;
+      }
+
+      currentUserEmail = email;
+      if (remember) {
+        localStorage.setItem(STORAGE_KEYS.SESSION, JSON.stringify({ email: currentUserEmail, loggedInAt: Date.now() }));
+      }
+
+      applyTheme(user.settings?.theme || 'slate', false);
+      if (user.settings?.customBg) {
+        setCustomBg(user.settings.customBg, false);
+      }
+
+      showToast('Signed in successfully!', 'success');
+      if (user.onboarded) {
+        showAppView();
+      } else {
+        showOnboardingView();
+      }
+    }
+
+    function handleLogout() {
+      localStorage.removeItem(STORAGE_KEYS.SESSION);
+      currentUserEmail = null;
+      document.body.classList.remove('has-custom-bg');
+      document.body.setAttribute('data-theme', 'slate');
+      showAuthView();
+      showToast('Logged out safely.', 'info');
+    }
+
+    // =========================================================================
+    // 4. VIEW SWITCHING
+    // =========================================================================
+    function showAuthView() {
+      document.getElementById('view-auth').classList.remove('hidden');
+      document.getElementById('view-onboarding').classList.add('hidden');
+      document.getElementById('view-app').classList.add('hidden');
+    }
+
+    function showOnboardingView() {
+      document.getElementById('view-auth').classList.add('hidden');
+      document.getElementById('view-onboarding').classList.remove('hidden');
+      document.getElementById('view-app').classList.add('hidden');
+      obState = { fixedItems: [], familyMembers: [] };
+      renderOnboardingLists();
+      goToOnboardingStep(1);
+    }
+
+    function showAppView() {
+      document.getElementById('view-auth').classList.add('hidden');
+      document.getElementById('view-onboarding').classList.add('hidden');
+      document.getElementById('view-app').classList.remove('hidden');
+      refreshAllAppUI();
+    }
+
+    // =========================================================================
+    // 5. ONBOARDING WIZARD & AI STRATEGY ENGINE
+    // =========================================================================
+    function updateOnboardingCurrencyLabels() {
+      const curr = document.getElementById('ob-currency').value;
+      const sym = CURRENCIES[curr].symbol;
+      document.querySelectorAll('.ob-curr-sym').forEach(el => el.textContent = sym);
+      renderOnboardingLists();
+    }
+
+    function goToOnboardingStep(step) {
+      const curr = document.getElementById('ob-currency').value;
+      const sym = CURRENCIES[curr].symbol;
+
+      if (step === 2) {
+        const name = document.getElementById('ob-name').value.trim();
+        const income = parseFloat(document.getElementById('ob-income').value);
+        if (!name) {
+          showToast('Please enter your name.', 'error');
+          return;
+        }
+        if (isNaN(income) || income <= 0) {
+          showToast('Please enter a valid monthly income greater than 0.', 'error');
+          return;
+        }
+      }
+
+      if (step === 3) {
+        runOnboardingAIStrategy();
+      }
+
+      [1, 2, 3].forEach(s => {
+        document.getElementById(`ob-step-${s}`).classList.toggle('hidden', s !== step);
+        const pill = document.getElementById(`ob-step-pill-${s}`);
+        if (s === step) {
+          pill.className = 'p-2.5 rounded-xl border-2 border-emerald-500 bg-emerald-50/70 text-xs font-bold flex items-center gap-2 text-slate-900';
+        } else if (s < step) {
+          pill.className = 'p-2.5 rounded-xl border border-emerald-300 bg-emerald-50/30 text-xs font-semibold flex items-center gap-2 text-emerald-800';
+        } else {
+          pill.className = 'p-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-muted flex items-center gap-2';
+        }
+      });
+    }
+
+    function addOnboardingFixedItem() {
+      const nameEl = document.getElementById('ob-fixed-name');
+      const amtEl = document.getElementById('ob-fixed-amount');
+      const name = nameEl.value.trim();
+      const amount = parseFloat(amtEl.value);
+
+      if (!name || isNaN(amount) || amount <= 0) {
+        showToast('Enter a valid expense name and amount.', 'error');
+        return;
+      }
+
+      obState.fixedItems.push({ id: 'fix_' + Date.now(), name, amount });
+      nameEl.value = '';
+      amtEl.value = '';
+      renderOnboardingLists();
+    }
+
+    function removeOnboardingFixedItem(id) {
+      obState.fixedItems = obState.fixedItems.filter(i => i.id !== id);
+      renderOnboardingLists();
+    }
+
+    function addOnboardingFamilyMember() {
+      const nameEl = document.getElementById('ob-fam-name');
+      const roleEl = document.getElementById('ob-fam-role');
+      const incEl = document.getElementById('ob-fam-income');
+      const expEl = document.getElementById('ob-fam-expense');
+
+      const name = nameEl.value.trim();
+      const role = roleEl.value;
+      const income = parseFloat(incEl.value) || 0;
+      const allowance = parseFloat(expEl.value) || 0;
+
+      if (!name) {
+        showToast('Enter family member name.', 'error');
+        return;
+      }
+
+      obState.familyMembers.push({
+        id: 'fam_' + Date.now(),
+        name,
+        role,
+        income,
+        allowance
+      });
+
+      nameEl.value = '';
+      incEl.value = '';
+      expEl.value = '';
+      renderOnboardingLists();
+    }
+
+    function removeOnboardingFamilyMember(id) {
+      obState.familyMembers = obState.familyMembers.filter(m => m.id !== id);
+      renderOnboardingLists();
+    }
+
+    function renderOnboardingLists() {
+      const curr = document.getElementById('ob-currency').value;
+      const sym = CURRENCIES[curr].symbol;
+
+      // Render Fixed Items
+      const fixedListEl = document.getElementById('ob-fixed-list');
+      const totalFixed = obState.fixedItems.reduce((sum, i) => sum + i.amount, 0);
+      document.getElementById('ob-must-spend-total').textContent = sym + totalFixed.toLocaleString();
+
+      fixedListEl.innerHTML = obState.fixedItems.length === 0
+        ? '<p class="text-[11px] text-muted italic">No fixed expenses added yet (e.g., Rent, Bills, School Fees).</p>'
+        : obState.fixedItems.map(item => `
+            <div class="flex items-center justify-between bg-white px-3 py-1.5 rounded-lg border text-xs text-slate-800">
+              <span class="font-medium">${escapeHtml(item.name)}</span>
+              <div class="flex items-center gap-3">
+                <span class="font-bold text-rose-600">${sym}${item.amount.toLocaleString()}</span>
+                <button type="button" onclick="removeOnboardingFixedItem('${item.id}')" class="text-slate-400 hover:text-rose-600"><i class="fa-solid fa-trash-can"></i></button>
+              </div>
+            </div>
+          `).join('');
+
+      // Render Family Members
+      const famListEl = document.getElementById('ob-family-list');
+      famListEl.innerHTML = obState.familyMembers.length === 0
+        ? '<p class="text-[11px] text-muted italic">No additional family members added (Personal Mode).</p>'
+        : obState.familyMembers.map(m => `
+            <div class="flex items-center justify-between bg-white px-3 py-1.5 rounded-lg border text-xs text-slate-800">
+              <div>
+                <span class="font-bold">${escapeHtml(m.name)}</span>
+                <span class="text-[11px] text-slate-500 ml-1">(${m.role})</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-[11px] text-emerald-600 font-semibold">+${sym}${m.income.toLocaleString()} inc</span>
+                <span class="text-[11px] text-amber-600 font-semibold">-${sym}${m.allowance.toLocaleString()} exp</span>
+                <button type="button" onclick="removeOnboardingFamilyMember('${m.id}')" class="text-slate-400 hover:text-rose-600"><i class="fa-solid fa-trash-can"></i></button>
+              </div>
+            </div>
+          `).join('');
+    }
+
+    function runOnboardingAIStrategy() {
+      const curr = document.getElementById('ob-currency').value;
+      const sym = CURRENCIES[curr].symbol;
+      const primaryIncome = parseFloat(document.getElementById('ob-income').value) || 0;
+      const familyIncome = obState.familyMembers.reduce((s, m) => s + m.income, 0);
+      const totalIncome = primaryIncome + familyIncome;
+
+      const fixedEssentials = obState.fixedItems.reduce((s, i) => s + i.amount, 0);
+      const familyAllowances = obState.familyMembers.reduce((s, m) => s + m.allowance, 0);
+      const totalMustSpend = fixedEssentials + familyAllowances;
+
+      const mustSpendRatio = totalIncome > 0 ? (totalMustSpend / totalIncome) * 100 : 50;
+
+      let recNeeds = 50, recWants = 30, recSavings = 20;
+      let title = '50/30/20 Balanced Growth Rule';
+      let reason = `Your fixed essentials & family commitments consume ${mustSpendRatio.toFixed(1)}% of household income, leaving healthy room for lifestyle wants and consistent wealth building.`;
+
+      if (mustSpendRatio > 62) {
+        recNeeds = 70;
+        recWants = 15;
+        recSavings = 15;
+        title = '70/15/15 Essential-Shield Rule';
+        reason = `Because your fixed obligations & family costs are ${mustSpendRatio.toFixed(1)}% of income, our AI tightens discretionary wants to 15% to protect your 15% savings floor.`;
+      } else if (mustSpendRatio < 40) {
+        recNeeds = 45;
+        recWants = 25;
+        recSavings = 30;
+        title = '45/25/30 Accelerated Wealth Rule';
+        reason = `Great news! Your fixed costs are only ${mustSpendRatio.toFixed(1)}% of income. Our AI recommends boosting savings to 30% to fast-track your financial goal.`;
+      }
+
+      document.getElementById('ai-rec-title').textContent = `Recommended Strategy: ${title}`;
+      document.getElementById('ai-rec-reason').textContent = reason;
+      document.getElementById('ai-rec-total-income').textContent = `${sym}${totalIncome.toLocaleString()}`;
+
+      document.getElementById('split-needs-slider').value = recNeeds;
+      document.getElementById('split-wants-slider').value = recWants;
+      document.getElementById('split-savings-slider').value = recSavings;
+      updateOnboardingSplitPreview();
+    }
+
+    function handleSplitSliderChange(changed) {
+      let n = parseInt(document.getElementById('split-needs-slider').value);
+      let w = parseInt(document.getElementById('split-wants-slider').value);
+      let s = parseInt(document.getElementById('split-savings-slider').value);
+
+      // Normalize to 100%
+      const diff = 100 - (n + w + s);
+      if (changed === 'needs') {
+        w = Math.max(5, Math.min(70, w + diff));
+        s = 100 - n - w;
+      } else if (changed === 'wants') {
+        s = Math.max(5, Math.min(70, s + diff));
+        n = 100 - w - s;
+      } else {
+        w = Math.max(5, Math.min(70, w + diff));
+        n = 100 - w - s;
+      }
+
+      document.getElementById('split-needs-slider').value = n;
+      document.getElementById('split-wants-slider').value = w;
+      document.getElementById('split-savings-slider').value = s;
+      updateOnboardingSplitPreview();
+    }
+
+    function updateOnboardingSplitPreview() {
+      const curr = document.getElementById('ob-currency').value;
+      const sym = CURRENCIES[curr].symbol;
+      const primaryIncome = parseFloat(document.getElementById('ob-income').value) || 0;
+      const familyIncome = obState.familyMembers.reduce((sum, m) => sum + m.income, 0);
+      const totalIncome = primaryIncome + familyIncome;
+
+      const n = parseInt(document.getElementById('split-needs-slider').value);
+      const w = parseInt(document.getElementById('split-wants-slider').value);
+      const s = parseInt(document.getElementById('split-savings-slider').value);
+
+      document.getElementById('split-needs-pct-label').textContent = `${n}%`;
+      document.getElementById('split-wants-pct-label').textContent = `${w}%`;
+      document.getElementById('split-savings-pct-label').textContent = `${s}%`;
+
+      const needsAmt = (totalIncome * n) / 100;
+      const wantsAmt = (totalIncome * w) / 100;
+      const savingsAmt = (totalIncome * s) / 100;
+
+      document.getElementById('split-needs-amt').textContent = `${sym}${Math.round(needsAmt).toLocaleString()}`;
+      document.getElementById('split-wants-amt').textContent = `${sym}${Math.round(wantsAmt).toLocaleString()}`;
+      document.getElementById('split-savings-amt').textContent = `${sym}${Math.round(savingsAmt).toLocaleString()}`;
+
+      // Render suggested itemized buckets
+      const previewEl = document.getElementById('ob-ai-breakdown-preview');
+      previewEl.innerHTML = `
+        <div class="p-2.5 rounded-lg bg-white border text-slate-800 flex justify-between">
+          <span>🏠 Housing, Bills & Essentials</span>
+          <strong>${sym}${Math.round(needsAmt * 0.75).toLocaleString()}</strong>
+        </div>
+        <div class="p-2.5 rounded-lg bg-white border text-slate-800 flex justify-between">
+          <span>🛒 Groceries & Daily Commute</span>
+          <strong>${sym}${Math.round(needsAmt * 0.25).toLocaleString()}</strong>
+        </div>
+        <div class="p-2.5 rounded-lg bg-white border text-slate-800 flex justify-between">
+          <span>🍽️ Dining, Leisure & Family Outings</span>
+          <strong>${sym}${Math.round(wantsAmt).toLocaleString()}</strong>
+        </div>
+        <div class="p-2.5 rounded-lg bg-white border text-slate-800 flex justify-between">
+          <span>🛡️ Automated Goal Vault Transfer</span>
+          <strong class="text-emerald-600">${sym}${Math.round(savingsAmt).toLocaleString()}</strong>
+        </div>
+      `;
+    }
+
+    function completeOnboarding() {
+      const name = document.getElementById('ob-name').value.trim();
+      const currency = document.getElementById('ob-currency').value;
+      const monthlyIncome = parseFloat(document.getElementById('ob-income').value) || 0;
+      const currentSavings = parseFloat(document.getElementById('ob-savings').value) || 0;
+      const goal = document.querySelector('input[name="ob-goal"]:checked')?.value || 'Emergency Fund';
+
+      const split = {
+        needs: parseInt(document.getElementById('split-needs-slider').value),
+        wants: parseInt(document.getElementById('split-wants-slider').value),
+        savings: parseInt(document.getElementById('split-savings-slider').value)
+      };
+
+      const autoSeed = document.getElementById('ob-auto-seed-essentials').checked;
+      const todayStr = new Date().toISOString().split('T')[0];
+
+      updateCurrentUser(user => {
+        user.onboarded = true;
+        user.profile = { name, currency, monthlyIncome, currentSavings, goal, split };
+        user.mustSpendItems = [...obState.fixedItems];
+        user.familyMembers = [
+          { id: 'fam_primary', name: `${name} (You)`, role: 'Primary Account Holder', income: monthlyIncome, allowance: 0 },
+          ...obState.familyMembers
+        ];
+
+        if (autoSeed) {
+          obState.fixedItems.forEach((item, idx) => {
+            user.transactions.push({
+              id: 'tx_init_' + Date.now() + '_' + idx,
+              amount: item.amount,
+              desc: `${item.name} (Must-Spend)`,
+              category: 'Needs',
+              member: `${name} (You)`,
+              date: todayStr
+            });
+          });
+        }
+      });
+
+      showToast('VaultGuard calibrated and ready!', 'success');
+      showAppView();
+    }
+
+    // =========================================================================
+    // 6. CORE CALCULATIONS & CURRENCY FORMATTING
+    // =========================================================================
+    function formatMoney(amountInUserCurr, currencyCode = null) {
+      const user = getCurrentUser();
+      const code = currencyCode || user?.profile?.currency || 'USD';
+      const meta = CURRENCIES[code] || CURRENCIES.USD;
+      const val = Number(amountInUserCurr) || 0;
+      return `${meta.symbol}${val.toLocaleString(undefined, {
+        minimumFractionDigits: meta.decimals,
+        maximumFractionDigits: meta.decimals
+      })}`;
+    }
+
+    function changeCurrency(newCode) {
+      const user = getCurrentUser();
+      if (!user) return;
+      const oldCode = user.profile.currency || 'USD';
+      if (oldCode === newCode) return;
+
+      const factor = CURRENCIES[newCode].rate / CURRENCIES[oldCode].rate;
+
+      updateCurrentUser(u => {
+        u.profile.currency = newCode;
+        u.profile.monthlyIncome = +(u.profile.monthlyIncome * factor).toFixed(2);
+        u.profile.currentSavings = +(u.profile.currentSavings * factor).toFixed(2);
+        u.mustSpendItems.forEach(item => item.amount = +(item.amount * factor).toFixed(2));
+        u.familyMembers.forEach(m => {
+          m.income = +(m.income * factor).toFixed(2);
+          m.allowance = +(m.allowance * factor).toFixed(2);
+        });
+        u.transactions.forEach(t => t.amount = +(t.amount * factor).toFixed(2));
+        u.wishlist.forEach(w => w.price = +(w.price * factor).toFixed(2));
+      });
+
+      refreshAllAppUI();
+      showToast(`Currency converted to ${newCode} (${CURRENCIES[newCode].symbol})`, 'info');
+    }
+
+    function getFinancialMetrics() {
+      const user = getCurrentUser();
+      if (!user) return null;
+
+      // Combined household income
+      const totalIncome = user.familyMembers.length > 0
+        ? user.familyMembers.reduce((sum, m) => sum + (Number(m.income) || 0), 0)
+        : Number(user.profile.monthlyIncome) || 0;
+
+      const split = user.profile.split || { needs: 50, wants: 30, savings: 20 };
+      const needsLimit = (totalIncome * split.needs) / 100;
+      const wantsLimit = (totalIncome * split.wants) / 100;
+      const savingsLimit = (totalIncome * split.savings) / 100;
+
+      // Current month transactions
+      const now = new Date();
+      const currentMonthPrefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+      const monthTxs = user.transactions.filter(t => t.date && t.date.startsWith(currentMonthPrefix));
+      const needsSpent = monthTxs.filter(t => t.category === 'Needs').reduce((s, t) => s + Number(t.amount), 0);
+      const wantsSpent = monthTxs.filter(t => t.category === 'Wants').reduce((s, t) => s + Number(t.amount), 0);
+      const savingsMonth = monthTxs.filter(t => t.category === 'Savings').reduce((s, t) => s + Number(t.amount), 0);
+
+      // Days remaining in current month
+      const totalDaysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+      const daysLeft = Math.max(1, totalDaysInMonth - now.getDate() + 1);
+
+      const remainingWants = Math.max(0, wantsLimit - wantsSpent);
+      const dailySafeToSpend = remainingWants / daysLeft;
+
+      // Locked Must-Spend sum
+      const lockedMustSpend = user.mustSpendItems.reduce((s, i) => s + Number(i.amount), 0);
+
+      // Budget Health Score (0 - 100)
+      let score = 100;
+      if (wantsLimit > 0 && wantsSpent > wantsLimit) {
+        score -= Math.min(40, Math.round(((wantsSpent - wantsLimit) / wantsLimit) * 50));
+      } else if (wantsLimit > 0 && wantsSpent > wantsLimit * 0.85) {
+        score -= 10;
+      }
+      if (needsLimit > 0 && needsSpent > needsLimit) {
+        score -= Math.min(25, Math.round(((needsSpent - needsLimit) / needsLimit) * 30));
+      }
+      if (savingsLimit > 0 && savingsMonth >= savingsLimit) {
+        score = Math.min(100, score + 5);
+      }
+      score = Math.max(0, Math.min(100, score));
+
+      return {
+        totalIncome,
+        split,
+        needsLimit,
+        wantsLimit,
+        savingsLimit,
+        needsSpent,
+        wantsSpent,
+        savingsMonth,
+        daysLeft,
+        remainingWants,
+        dailySafeToSpend,
+        lockedMustSpend,
+        healthScore: score
+      };
+    }
+
+    // =========================================================================
+    // 7. MAIN DASHBOARD UI RENDERING & CHARTS
+    // =========================================================================
+    function switchMainTab(tabName) {
+      ['dashboard', 'ai', 'family', 'settings'].forEach(t => {
+        document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== tabName);
+
+        // Desktop nav styling
+        const dBtn = document.getElementById(`nav-btn-${t}`);
+        if (dBtn) {
+          if (t === tabName) {
+            dBtn.classList.add('bg-white', 'text-slate-900', 'shadow-sm');
+            dBtn.classList.remove('text-muted');
+          } else {
+            dBtn.classList.remove('bg-white', 'text-slate-900', 'shadow-sm');
+            dBtn.classList.add('text-muted');
+          }
+        }
+
+        // Mobile nav styling
+        const mBtn = document.getElementById(`m-nav-btn-${t}`);
+        if (mBtn) {
+          if (t === tabName) {
+            mBtn.classList.add('bg-emerald-600', 'text-white');
+            mBtn.classList.remove('text-muted');
+          } else {
+            mBtn.classList.remove('bg-emerald-600', 'text-white');
+            mBtn.classList.add('text-muted');
+          }
+        }
+      });
+
+      if (tabName === 'dashboard') {
+        renderCharts();
+      } else if (tabName === 'ai') {
+        refreshAIPlannerSummary();
+      } else if (tabName === 'family') {
+        renderFamilyHub();
+      } else if (tabName === 'settings') {
+        populateSettingsForm();
+      }
+    }
+
+    function refreshAllAppUI() {
+      const user = getCurrentUser();
+      const metrics = getFinancialMetrics();
+      if (!user || !metrics) return;
+
+      const currCode = user.profile.currency || 'USD';
+      const sym = CURRENCIES[currCode].symbol;
+
+      // Update Header
+      document.getElementById('header-user-name').textContent = user.profile.name || 'User';
+      document.getElementById('header-goal-badge').textContent = user.profile.goal;
+      document.getElementById('header-currency-select').value = currCode;
+      document.querySelectorAll('.active-curr-sym').forEach(el => el.textContent = sym);
+
+      // Update KPIs
+      document.getElementById('kpi-total-budget').textContent = formatMoney(metrics.totalIncome);
+      document.getElementById('kpi-budget-sub').textContent = `Strategy: ${metrics.split.needs}/${metrics.split.wants}/${metrics.split.savings} Split`;
+
+      document.getElementById('kpi-safe-daily').textContent = formatMoney(metrics.dailySafeToSpend);
+      document.getElementById('kpi-safe-sub').textContent = `${formatMoney(metrics.remainingWants)} Wants left • ${metrics.daysLeft} days left`;
+
+      document.getElementById('kpi-saved-month').textContent = formatMoney(metrics.savingsMonth);
+      document.getElementById('kpi-saved-total').textContent = `Total Vault Reserve: ${formatMoney(user.profile.currentSavings + metrics.savingsMonth)}`;
+
+      document.getElementById('kpi-health-score').textContent = metrics.healthScore;
+      const healthBadge = document.getElementById('kpi-health-badge');
+      if (metrics.healthScore >= 80) {
+        healthBadge.textContent = 'Optimal';
+        healthBadge.className = 'ml-auto text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800';
+      } else if (metrics.healthScore >= 55) {
+        healthBadge.textContent = 'Caution';
+        healthBadge.className = 'ml-auto text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800';
+      } else {
+        healthBadge.textContent = 'Overspending';
+        healthBadge.className = 'ml-auto text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800';
+      }
+
+      // Update Guardrail Bars
+      updateGuardrailBar('needs', metrics.needsSpent, metrics.needsLimit);
+      updateGuardrailBar('wants', metrics.wantsSpent, metrics.wantsLimit);
+      updateGuardrailBar('savings', metrics.savingsMonth, metrics.savingsLimit, true);
+      document.getElementById('bar-goal-name').textContent = user.profile.goal;
+
+      const wantsPct = metrics.wantsLimit > 0 ? (metrics.wantsSpent / metrics.wantsLimit) * 100 : 0;
+      document.getElementById('wants-guardrail-alert').classList.toggle('hidden', wantsPct < 90);
+
+      // Update Locked Must-Spend Display & Wishlist
+      document.getElementById('locked-must-spend-display').textContent = formatMoney(metrics.lockedMustSpend);
+      renderWishlist();
+
+      // Update Member Dropdowns
+      populateMemberSelects();
+
+      // Update Transactions Table
+      renderTransactions();
+
+      // Update Charts
+      renderCharts();
+    }
+
+    function updateGuardrailBar(type, spent, limit, isSavings = false) {
+      const pct = limit > 0 ? Math.round((spent / limit) * 100) : 0;
+      const visualWidth = Math.min(100, pct);
+
+      document.getElementById(`bar-${type}-spent`).textContent = formatMoney(spent);
+      document.getElementById(`bar-${type}-limit`).textContent = formatMoney(limit);
+      document.getElementById(`bar-${type}-pct`).textContent = `${pct}%`;
+
+      const fillEl = document.getElementById(`bar-${type}-fill`);
+      fillEl.style.width = `${visualWidth}%`;
+
+      if (isSavings) {
+        fillEl.className = 'h-full rounded-full bg-indigo-600 transition-all duration-500';
+      } else {
+        if (pct >= 90) {
+          fillEl.className = 'h-full rounded-full bg-rose-600 transition-all duration-500';
+        } else if (pct >= 75) {
+          fillEl.className = 'h-full rounded-full bg-amber-500 transition-all duration-500';
+        } else {
+          fillEl.className = 'h-full rounded-full bg-emerald-500 transition-all duration-500';
+        }
+      }
+    }
+
+    function populateMemberSelects() {
+      const user = getCurrentUser();
+      if (!user) return;
+
+      const txMemberSelect = document.getElementById('tx-member');
+      const filterMemberSelect = document.getElementById('filter-member');
+      const currentFilter = filterMemberSelect.value || 'ALL';
+
+      const members = user.familyMembers.length > 0
+        ? user.familyMembers
+        : [{ name: `${user.profile.name} (You)` }];
+
+      txMemberSelect.innerHTML = members.map(m =>
+        `<option value="${escapeHtml(m.name)}">${escapeHtml(m.name)}</option>`
+      ).join('');
+
+      filterMemberSelect.innerHTML = `<option value="ALL">All Members</option>` +
+        members.map(m => `<option value="${escapeHtml(m.name)}">${escapeHtml(m.name)}</option>`).join('');
+      filterMemberSelect.value = currentFilter;
+    }
+
+    // =========================================================================
+    // 8. TRANSACTIONS & ANTI-OVERSPENDING LOCKOUT
+    // =========================================================================
+    function handleAddTransaction(e) {
+      e.preventDefault();
+      const amount = parseFloat(document.getElementById('tx-amount').value);
+      const desc = document.getElementById('tx-desc').value.trim();
+      const category = document.getElementById('tx-category').value;
+      const member = document.getElementById('tx-member').value;
+      const date = document.getElementById('tx-date').value;
+
+      if (isNaN(amount) || amount <= 0 || !desc || !date) {
+        showToast('Please enter valid transaction details.', 'error');
+        return;
+      }
+
+      const metrics = getFinancialMetrics();
+
+      // Guardrail Lockout Check for Discretionary "Wants"
+      if (category === 'Wants' && metrics.wantsLimit > 0) {
+        const projectedWants = metrics.wantsSpent + amount;
+        const projectedPct = (projectedWants / metrics.wantsLimit) * 100;
+
+        if (projectedPct >= 90 || amount > metrics.dailySafeToSpend * 1.5) {
+          openConfirmModal(
+            'Guardrail Overspending Alert',
+            `Logging "${desc}" (${formatMoney(amount)}) pushes your Flexible Wants usage to ${Math.round(projectedPct)}% (${formatMoney(projectedWants)} / ${formatMoney(metrics.wantsLimit)}). Are you sure you want to override your guardrail?`,
+            () => commitTransaction({ amount, desc, category, member, date })
+          );
+          return;
+        }
+      }
+
+      commitTransaction({ amount, desc, category, member, date });
+    }
+
+    function commitTransaction(txData) {
+      updateCurrentUser(user => {
+        user.transactions.unshift({
+          id: 'tx_' + Date.now(),
+          ...txData
+        });
+      });
+
+      document.getElementById('tx-amount').value = '';
+      document.getElementById('tx-desc').value = '';
+      refreshAllAppUI();
+      showToast(`Recorded ${txData.category}: ${formatMoney(txData.amount)}`, 'success');
+    }
+
+    function deleteTransaction(txId) {
+      updateCurrentUser(user => {
+        user.transactions = user.transactions.filter(t => t.id !== txId);
+      });
+      refreshAllAppUI();
+      showToast('Transaction deleted and totals recalculated.', 'info');
+    }
+
+    function renderTransactions() {
+      const user = getCurrentUser();
+      if (!user) return;
+
+      const catFilter = document.getElementById('filter-category').value;
+      const memFilter = document.getElementById('filter-member').value;
+
+      const filtered = user.transactions.filter(t => {
+        const matchCat = catFilter === 'ALL' || t.category === catFilter;
+        const matchMem = memFilter === 'ALL' || t.member === memFilter;
+        return matchCat && matchMem;
+      });
+
+      const tbody = document.getElementById('tx-table-body');
+      const emptyState = document.getElementById('tx-empty-state');
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+      tbody.innerHTML = filtered.map(tx => {
+        let badgeClass = 'bg-amber-100 text-amber-800';
+        let amountClass = 'text-slate-900 font-bold';
+        if (tx.category === 'Needs') {
+          badgeClass = 'bg-rose-100 text-rose-800';
+        } else if (tx.category === 'Savings') {
+          badgeClass = 'bg-emerald-100 text-emerald-800';
+          amountClass = 'text-emerald-600 font-extrabold';
+        }
+
+        return `
+          <tr class="hover:bg-slate-50/60 transition">
+            <td class="py-2.5 px-2 whitespace-nowrap text-muted">${escapeHtml(tx.date)}</td>
+            <td class="py-2.5 px-2 font-semibold">${escapeHtml(tx.desc)}</td>
+            <td class="py-2.5 px-2 text-muted">${escapeHtml(tx.member || 'Primary')}</td>
+            <td class="py-2.5 px-2">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeClass}">${tx.category}</span>
+            </td>
+            <td class="py-2.5 px-2 text-right ${amountClass}">${tx.category === 'Savings' ? '+' : '-'}${formatMoney(tx.amount)}</td>
+            <td class="py-2.5 px-2 text-center">
+              <button onclick="deleteTransaction('${tx.id}')" class="text-slate-400 hover:text-rose-600 p-1 transition" title="Delete Entry">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // =========================================================================
+    // 9. IMPULSE PURCHASE FRICTION MODAL & 24-HOUR COOLING-OFF WISHLIST
+    // =========================================================================
+    function openImpulseModal() {
+      document.getElementById('imp-item-name').value = '';
+      document.getElementById('imp-item-price').value = '';
+      document.getElementById('imp-result-box').classList.add('hidden');
+      document.getElementById('modal-impulse').classList.remove('hidden');
+    }
+
+    function closeImpulseModal() {
+      document.getElementById('modal-impulse').classList.add('hidden');
+    }
+
+    function evaluateImpulsePurchase() {
+      const price = parseFloat(document.getElementById('imp-item-price').value);
+      const resBox = document.getElementById('imp-result-box');
+
+      if (isNaN(price) || price <= 0) {
+        resBox.classList.add('hidden');
+        return;
+      }
+
+      const metrics = getFinancialMetrics();
+      resBox.classList.remove('hidden');
+
+      const newRemainingWants = Math.max(0, metrics.remainingWants - price);
+      const newDailySafe = newRemainingWants / metrics.daysLeft;
+      const dailySavingsRate = metrics.savingsLimit > 0 ? metrics.savingsLimit / 30 : 1;
+      const goalDelayDays = Math.ceil(price / Math.max(1, dailySavingsRate));
+
+      document.getElementById('imp-new-daily').textContent = formatMoney(newDailySafe);
+      document.getElementById('imp-goal-delay').textContent = `${goalDelayDays} day${goalDelayDays === 1 ? '' : 's'}`;
+
+      const titleEl = document.getElementById('imp-verdict-title');
+      const descEl = document.getElementById('imp-verdict-desc');
+
+      if (price > metrics.remainingWants) {
+        titleEl.textContent = '🛑 Guardrail Breach: Exceeds Remaining Wants Budget!';
+        titleEl.className = 'font-extrabold text-sm text-rose-600';
+        descEl.textContent = `Buying this will wipe out your remaining discretionary allowance for the entire month and set your savings goal back by ${goalDelayDays} days.`;
+      } else if (price > metrics.dailySafeToSpend) {
+        titleEl.textContent = '⚠️ Friction Warning: Exceeds Today’s Safe Limit';
+        titleEl.className = 'font-extrabold text-sm text-amber-600';
+        descEl.textContent = `This purchase exceeds your ${formatMoney(metrics.dailySafeToSpend)} daily safe limit. Your daily allowance drops to ${formatMoney(newDailySafe)} for the remaining ${metrics.daysLeft} days.`;
+      } else {
+        titleEl.textContent = '✅ Safe Within Daily Guardrail';
+        titleEl.className = 'font-extrabold text-sm text-emerald-600';
+        descEl.textContent = `This fits inside today's Safe-to-Spend limit! Even so, parking non-urgent items for 24 hours saves an average of 35% per month.`;
+      }
+    }
+
+    function parkInCoolingWishlist() {
+      const name = document.getElementById('imp-item-name').value.trim();
+      const price = parseFloat(document.getElementById('imp-item-price').value);
+
+      if (!name || isNaN(price) || price <= 0) {
+        showToast('Enter both an item name and price to park it.', 'error');
+        return;
+      }
+
+      updateCurrentUser(user => {
+        user.wishlist.unshift({
+          id: 'wish_' + Date.now(),
+          name,
+          price,
+          addedAt: Date.now()
+        });
+      });
+
+      closeImpulseModal();
+      renderWishlist();
+      showToast(`"${name}" parked in your 24-Hour Cooling-Off Wishlist!`, 'success');
+    }
+
+    function buyImpulseItemNow() {
+      const name = document.getElementById('imp-item-name').value.trim();
+      const price = parseFloat(document.getElementById('imp-item-price').value);
+
+      if (!name || isNaN(price) || price <= 0) {
+        showToast('Enter item name and price first.', 'error');
+        return;
+      }
+
+      const user = getCurrentUser();
+      const todayStr = new Date().toISOString().split('T')[0];
+      closeImpulseModal();
+
+      commitTransaction({
+        amount: price,
+        desc: name,
+        category: 'Wants',
+        member: user.familyMembers[0]?.name || user.profile.name,
+        date: todayStr
+      });
+    }
+
+    function removeWishlistItem(id) {
+      updateCurrentUser(user => {
+        user.wishlist = user.wishlist.filter(w => w.id !== id);
+      });
+      renderWishlist();
+      showToast('Impulse resisted! Item removed from wishlist.', 'success');
+    }
+
+    function renderWishlist() {
+      const user = getCurrentUser();
+      if (!user) return;
+      const container = document.getElementById('wishlist-container');
+      document.getElementById('wishlist-count-badge').textContent = `${user.wishlist.length} item${user.wishlist.length === 1 ? '' : 's'}`;
+
+      if (user.wishlist.length === 0) {
+        container.innerHTML = `<p class="text-xs text-muted italic py-4 text-center">No impulse items parked yet. Use "Can I Afford This?" to test purchases.</p>`;
+        return;
+      }
+
+      container.innerHTML = user.wishlist.map(item => {
+        const hrsElapsed = Math.floor((Date.now() - item.addedAt) / (1000 * 60 * 60));
+        const hrsLeft = Math.max(0, 24 - hrsElapsed);
+        return `
+          <div class="p-2.5 rounded-xl bg-soft flex items-center justify-between gap-2 text-xs">
+            <div>
+              <p class="font-bold">${escapeHtml(item.name)}</p>
+              <p class="text-[10px] text-sky-700 font-semibold">
+                <i class="fa-regular fa-clock mr-1"></i> ${hrsLeft > 0 ? `${hrsLeft}h cooling left` : '24h complete — ready to decide'}
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="font-extrabold">${formatMoney(item.price)}</span>
+              <button onclick="removeWishlistItem('${item.id}')" class="text-rose-500 hover:text-rose-700 p-1" title="Resist & Delete">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // =========================================================================
+    // 10. DATA VISUALIZATIONS (CHART.JS)
+    // =========================================================================
+    function renderCharts() {
+      const metrics = getFinancialMetrics();
+      const user = getCurrentUser();
+      if (!metrics || !user) return;
+
+      // 1. Doughnut Chart: Actual Spending vs Target Allocation
+      const ctxAlloc = document.getElementById('chart-allocation')?.getContext('2d');
+      if (ctxAlloc) {
+        if (allocationChartInstance) allocationChartInstance.destroy();
+        const unspentBudget = Math.max(0, metrics.totalIncome - (metrics.needsSpent + metrics.wantsSpent + metrics.savingsMonth));
+
+        allocationChartInstance = new Chart(ctxAlloc, {
+          type: 'doughnut',
+          data: {
+            labels: ['Must-Spend (Needs)', 'Flexible Wants', 'Saved This Month', 'Remaining Unallocated'],
+            datasets: [{
+              data: [metrics.needsSpent, metrics.wantsSpent, metrics.savingsMonth, unspentBudget],
+              backgroundColor: ['#f43f5e', '#f59e0b', '#10b981', '#cbd5e1'],
+              borderWidth: 2,
+              borderColor: '#ffffff'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '66%',
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: { boxWidth: 12, font: { size: 11, family: 'Inter' } }
+              }
+            }
+          }
+        });
+      }
+
+      // 2. Bar + Line Chart: Last 7 Days Discretionary Spending vs Daily Safe Limit
+      const ctxDaily = document.getElementById('chart-daily')?.getContext('2d');
+      if (ctxDaily) {
+        if (dailyChartInstance) dailyChartInstance.destroy();
+
+        const labels = [];
+        const dailySpendData = [];
+        const safeLineData = [];
+        const safeLimit = Number(metrics.dailySafeToSpend.toFixed(2));
+
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date();
+          d.setDate(d.getDate() - i);
+          const dateStr = d.toISOString().split('T')[0];
+          const shortLabel = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+          labels.push(shortLabel);
+
+          const daySpent = user.transactions
+            .filter(t => t.date === dateStr && t.category === 'Wants')
+            .reduce((s, t) => s + Number(t.amount), 0);
+
+          dailySpendData.push(daySpent);
+          safeLineData.push(safeLimit);
+        }
+
+        dailyChartInstance = new Chart(ctxDaily, {
+          type: 'bar',
+          data: {
+            labels,
+            datasets: [
+              {
+                label: 'Discretionary Spend',
+                data: dailySpendData,
+                backgroundColor: dailySpendData.map(v => v > safeLimit ? '#f43f5e' : '#3b82f6'),
+                borderRadius: 6
+              },
+              {
+                label: 'Daily Safe-to-Spend Limit',
+                data: safeLineData,
+                type: 'line',
+                borderColor: '#10b981',
+                borderWidth: 2,
+                borderDash: [5, 5],
+                pointRadius: 3,
+                fill: false
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: { beginAtZero: true, grid: { color: 'rgba(148, 163, 184, 0.15)' } },
+              x: { grid: { display: false } }
+            },
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: { boxWidth: 12, font: { size: 11, family: 'Inter' } }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    // =========================================================================
+    // 11. AI FINANCIAL ADVISOR & AUTO-ALLOCATE EXPENSE ENGINE
+    // =========================================================================
+    function refreshAIPlannerSummary() {
+      const metrics = getFinancialMetrics();
+      if (!metrics) return;
+      const surplus = Math.max(0, metrics.totalIncome - metrics.lockedMustSpend);
+      document.getElementById('ai-planner-income').textContent = formatMoney(metrics.totalIncome);
+      document.getElementById('ai-planner-must').textContent = formatMoney(metrics.lockedMustSpend);
+      document.getElementById('ai-planner-surplus').textContent = formatMoney(surplus);
+    }
+
+    function generateAIExpensePlan() {
+      const user = getCurrentUser();
+      const metrics = getFinancialMetrics();
+      if (!user || !metrics) return;
+
+      const surplus = Math.max(0, metrics.totalIncome - metrics.lockedMustSpend);
+      const outputEl = document.getElementById('ai-expense-plan-output');
+
+      if (surplus <= 0) {
+        outputEl.innerHTML = `
+          <div class="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs">
+            <strong>Deficit Alert:</strong> Your locked Must-Spend items (${formatMoney(metrics.lockedMustSpend)}) equal or exceed your household income (${formatMoney(metrics.totalIncome)}). Visit Settings or Family Hub to optimize fixed costs or add secondary income.
+          </div>
+        `;
+        return;
+      }
+
+      const buckets = [
+        { name: 'Emergency & Goal Vault', pct: 40, amt: surplus * 0.40, cat: 'Savings', icon: 'fa-shield-halved text-emerald-600' },
+        { name: 'Groceries & Household Supplies', pct: 25, amt: surplus * 0.25, cat: 'Needs', icon: 'fa-basket-shopping text-blue-600' },
+        { name: 'Family Dining & Weekend Leisure', pct: 20, amt: surplus * 0.20, cat: 'Wants', icon: 'fa-utensils text-amber-600' },
+        { name: 'Personal & Kid Allowances Buffer', pct: 15, amt: surplus * 0.15, cat: 'Wants', icon: 'fa-children text-indigo-600' }
+      ];
+
+      outputEl.innerHTML = `
+        <p class="text-[11px] font-bold uppercase tracking-wider text-emerald-600 mb-1">Recommended Post-Essential Allocation:</p>
+        ${buckets.map(b => `
+          <div class="p-3 rounded-xl bg-soft border flex items-center justify-between text-xs" style="border-color: var(--border-color);">
+            <div class="flex items-center gap-2.5">
+              <i class="fa-solid ${b.icon} text-sm"></i>
+              <div>
+                <p class="font-bold">${b.name}</p>
+                <p class="text-[10px] text-muted">${b.pct}% of surplus • Category: ${b.cat}</p>
+              </div>
+            </div>
+            <strong class="text-sm">${formatMoney(b.amt)}</strong>
+          </div>
+        `).join('')}
+      `;
+      showToast('AI optimal expense plan generated!', 'success');
+    }
+
+    function askQuickPrompt(questionText) {
+      document.getElementById('ai-chat-input').value = questionText;
+      handleAIChatSubmit(new Event('submit'));
+    }
+
+    function clearAIChat() {
+      const chatBox = document.getElementById('ai-chat-messages');
+      chatBox.innerHTML = `
+        <div class="flex gap-2.5 items-start">
+          <div class="w-7 h-7 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs shrink-0 mt-0.5">
+            <i class="fa-solid fa-robot"></i>
+          </div>
+          <div class="p-3.5 rounded-2xl rounded-tl-none bg-soft text-xs leading-relaxed max-w-[85%]">
+            Chat cleared. Ask me anything about your household budget, savings timeline, or spending decisions!
+          </div>
+        </div>
+      `;
+    }
+
+    async function handleAIChatSubmit(e) {
+      e.preventDefault();
+      const inputEl = document.getElementById('ai-chat-input');
+      const userQuery = inputEl.value.trim();
+      if (!userQuery) return;
+
+      inputEl.value = '';
+      appendChatBubble('user', userQuery);
+
+      const typingId = 'ai-typing-' + Date.now();
+      appendChatBubble('ai', '<i class="fa-solid fa-circle-notch fa-spin mr-1"></i> Analyzing your household ledger...', typingId);
+
+      const user = getCurrentUser();
+      const metrics = getFinancialMetrics();
+
+      // Build rich financial context for Gemini API
+      const contextSummary = `
+        User Name: ${user.profile.name}
+        Currency: ${user.profile.currency} (${CURRENCIES[user.profile.currency].symbol})
+        Total Household Monthly Income: ${formatMoney(metrics.totalIncome)}
+        Budget Split Rule: ${metrics.split.needs}% Needs / ${metrics.split.wants}% Wants / ${metrics.split.savings}% Savings
+        Locked Must-Spend Essentials: ${formatMoney(metrics.lockedMustSpend)} (${user.mustSpendItems.map(i => i.name + ': ' + formatMoney(i.amount)).join(', ') || 'None'})
+        Needs Spent This Month: ${formatMoney(metrics.needsSpent)} of ${formatMoney(metrics.needsLimit)}
+        Wants Spent This Month: ${formatMoney(metrics.wantsSpent)} of ${formatMoney(metrics.wantsLimit)}
+        Daily Safe-to-Spend Remaining: ${formatMoney(metrics.dailySafeToSpend)} (${metrics.daysLeft} days left)
+        Saved This Month: ${formatMoney(metrics.savingsMonth)} (Total Reserve: ${formatMoney(user.profile.currentSavings + metrics.savingsMonth)})
+        Primary Goal: ${user.profile.goal}
+        Family Members: ${user.familyMembers.map(m => `${m.name} (${m.role}, Income: ${formatMoney(m.income)}, Allowance: ${formatMoney(m.allowance)})`).join('; ')}
+      `;
+
+      const reply = await queryGeminiFinancialAdvisor(userQuery, contextSummary);
+      const typingEl = document.getElementById(typingId);
+      if (typingEl) {
+        typingEl.innerHTML = formatMarkdownSimple(reply);
+      }
+    }
+
+    async function queryGeminiFinancialAdvisor(userQuery, contextSummary) {
+      const apiKey = ""; // Runtime environment provides key automatically
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+      const systemPrompt = `You are VaultGuard AI, a sharp, empathetic personal and family financial advisor.
+      Use the user's exact financial figures provided in the context to give concrete, actionable calculations in their chosen currency.
+      Keep responses concise (3-5 short bullet points or 2 short paragraphs), practical, and focused on preventing overspending and accelerating their savings goal.`;
+
+      const payload = {
+        contents: [{
+          parts: [{ text: `User Financial Context:\n${contextSummary}\n\nUser Question: ${userQuery}` }]
+        }],
+        systemInstruction: {
+          parts: [{ text: systemPrompt }]
+        }
+      };
+
+      // Exponential backoff retry wrapper
+      const delays = [1000, 2000, 4000];
+      for (let attempt = 0; attempt <= delays.length; attempt++) {
+        try {
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          if (!response.ok) throw new Error('API request failed');
+          const result = await response.json();
+          const text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (text) return text;
+          throw new Error('Empty response');
+        } catch (err) {
+          if (attempt < delays.length) {
+            await new Promise(r => setTimeout(r, delays[attempt]));
+          } else {
+            return generateLocalSmartFinancialResponse(userQuery);
+          }
+        }
+      }
+    }
+
+    // Deterministic Smart Financial Calculator Fallback if offline or API unavailable
+    function generateLocalSmartFinancialResponse(query) {
+      const metrics = getFinancialMetrics();
+      const user = getCurrentUser();
+      const q = query.toLowerCase();
+
+      if (q.includes('save') || q.includes('20%')) {
+        const extraSaveTarget = metrics.totalIncome * 0.20;
+        const trimWants = Math.max(0, extraSaveTarget - metrics.savingsMonth);
+        return `Based on your household income of **${formatMoney(metrics.totalIncome)}**, saving 20% equals **${formatMoney(extraSaveTarget)}/month**.\n• You have saved **${formatMoney(metrics.savingsMonth)}** so far this month.\n• Keep daily discretionary spending under **${formatMoney(metrics.dailySafeToSpend)}** for the next ${metrics.daysLeft} days to hit your target without touching your locked Must-Spend reserve (${formatMoney(metrics.lockedMustSpend)}).`;
+      }
+
+      if (q.includes('emergency') || q.includes('timeline') || q.includes('goal')) {
+        const sixMonthTarget = Math.max(metrics.lockedMustSpend * 6, metrics.totalIncome * 3);
+        const currentTotal = user.profile.currentSavings + metrics.savingsMonth;
+        const gap = Math.max(0, sixMonthTarget - currentTotal);
+        const monthlyRate = Math.max(1, metrics.savingsLimit);
+        const monthsNeeded = Math.ceil(gap / monthlyRate);
+        return `For your **${user.profile.goal}** target:\n• Recommended 6-month safety net: **${formatMoney(sixMonthTarget)}**.\n• Your current vault reserve is **${formatMoney(currentTotal)}**.\n• At your planned savings rate of **${formatMoney(metrics.savingsLimit)}/month**, you will reach full security in approximately **${monthsNeeded} month(s)**.`;
+      }
+
+      if (q.includes('family') || q.includes('kid') || q.includes('student') || q.includes('allowance')) {
+        const totalAllowances = user.familyMembers.reduce((s, m) => s + Number(m.allowance || 0), 0);
+        const recommendedCap = metrics.wantsLimit * 0.45;
+        return `**Family Allowance Assessment:**\n• Current combined member allowances: **${formatMoney(totalAllowances)}/month** across ${user.familyMembers.length} member(s).\n• To stay inside your **${formatMoney(metrics.wantsLimit)}** Flexible Wants guardrail, keep total kid/student allowances under **${formatMoney(recommendedCap)}/month**.`;
+      }
+
+      return `**Live Ledger Snapshot for ${user.profile.name}:**\n• **Safe to Spend Today:** ${formatMoney(metrics.dailySafeToSpend)} (${metrics.daysLeft} days remaining).\n• **Must-Spend Locked:** ${formatMoney(metrics.lockedMustSpend)} | **Wants Used:** ${formatMoney(metrics.wantsSpent)} / ${formatMoney(metrics.wantsLimit)}.\n• **Action Tip:** Any purchase above ${formatMoney(metrics.dailySafeToSpend)} should be parked in your 24-Hour Cooling-Off Wishlist first!`;
+    }
+
+    function appendChatBubble(sender, htmlContent, elementId = null) {
+      const chatBox = document.getElementById('ai-chat-messages');
+      const wrapper = document.createElement('div');
+      wrapper.className = sender === 'user' ? 'flex justify-end' : 'flex gap-2.5 items-start';
+
+      if (sender === 'user') {
+        wrapper.innerHTML = `
+          <div class="p-3.5 rounded-2xl rounded-tr-none bg-emerald-600 text-white text-xs leading-relaxed max-w-[82%] shadow-sm">
+            ${escapeHtml(htmlContent)}
+          </div>
+        `;
+      } else {
+        wrapper.innerHTML = `
+          <div class="w-7 h-7 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs shrink-0 mt-0.5">
+            <i class="fa-solid fa-robot"></i>
+          </div>
+          <div ${elementId ? `id="${elementId}"` : ''} class="p-3.5 rounded-2xl rounded-tl-none bg-soft text-xs leading-relaxed max-w-[85%]">
+            ${htmlContent}
+          </div>
+        `;
+      }
+
+      chatBox.appendChild(wrapper);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // =========================================================================
+    // 12. FAMILY HUB MANAGEMENT
+    // =========================================================================
+    function handleAddFamilyMemberTab(e) {
+      e.preventDefault();
+      const name = document.getElementById('fam-new-name').value.trim();
+      const role = document.getElementById('fam-new-role').value;
+      const income = parseFloat(document.getElementById('fam-new-income').value) || 0;
+      const allowance = parseFloat(document.getElementById('fam-new-allowance').value) || 0;
+
+      if (!name) return;
+
+      updateCurrentUser(user => {
+        user.familyMembers.push({
+          id: 'fam_' + Date.now(),
+          name,
+          role,
+          income,
+          allowance
+        });
+      });
+
+      document.getElementById('fam-new-name').value = '';
+      document.getElementById('fam-new-income').value = '0';
+      document.getElementById('fam-new-allowance').value = '0';
+
+      renderFamilyHub();
+      refreshAllAppUI();
+      showToast(`${name} added to your Family Hub!`, 'success');
+    }
+
+    function removeFamilyMemberTab(id) {
+      updateCurrentUser(user => {
+        if (user.familyMembers.length <= 1) {
+          showToast('At least one primary account holder must remain.', 'error');
+          return;
+        }
+        user.familyMembers = user.familyMembers.filter(m => m.id !== id);
+      });
+      renderFamilyHub();
+      refreshAllAppUI();
+    }
+
+    function renderFamilyHub() {
+      const user = getCurrentUser();
+      if (!user) return;
+
+      const totalInc = user.familyMembers.reduce((s, m) => s + Number(m.income || 0), 0);
+      const totalAll = user.familyMembers.reduce((s, m) => s + Number(m.allowance || 0), 0);
+
+      document.getElementById('fam-total-income').textContent = formatMoney(totalInc);
+      document.getElementById('fam-total-allowances').textContent = formatMoney(totalAll);
+
+      const grid = document.getElementById('family-members-grid');
+      grid.innerHTML = user.familyMembers.map(m => {
+        const memberSpent = user.transactions
+          .filter(t => t.member === m.name && t.category !== 'Savings')
+          .reduce((s, t) => s + Number(t.amount), 0);
+
+        let icon = 'fa-user-tie text-indigo-600';
+        if (m.role.includes('Student')) icon = 'fa-graduation-cap text-blue-600';
+        else if (m.role.includes('Kid')) icon = 'fa-child-reaching text-amber-500';
+        else if (m.role.includes('Spouse')) icon = 'fa-heart text-rose-500';
+
+        return `
+          <div class="vg-card p-5 space-y-3 flex flex-col justify-between">
+            <div class="flex items-start justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-soft flex items-center justify-center">
+                  <i class="fa-solid ${icon} text-lg"></i>
+                </div>
+                <div>
+                  <h4 class="text-sm font-extrabold">${escapeHtml(m.name)}</h4>
+                  <span class="text-[11px] font-semibold text-muted">${escapeHtml(m.role)}</span>
+                </div>
+              </div>
+              ${m.id !== 'fam_primary' ? `
+                <button onclick="removeFamilyMemberTab('${m.id}')" class="text-slate-400 hover:text-rose-600 p-1" title="Remove Member">
+                  <i class="fa-solid fa-trash-can text-xs"></i>
+                </button>
+              ` : '<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">Admin</span>'}
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 pt-2 border-t text-xs" style="border-color: var(--border-color);">
+              <div>
+                <span class="text-[10px] text-muted block">Income</span>
+                <strong class="text-emerald-600">${formatMoney(m.income)}</strong>
+              </div>
+              <div>
+                <span class="text-[10px] text-muted block">Allowance</span>
+                <strong class="text-amber-600">${formatMoney(m.allowance)}</strong>
+              </div>
+              <div>
+                <span class="text-[10px] text-muted block">Logged Spend</span>
+                <strong>${formatMoney(memberSpent)}</strong>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // =========================================================================
+    // 13. SETTINGS, MUST-SPEND EDITOR & COLORFUL / IMAGE THEMES
+    // =========================================================================
+    function populateSettingsForm() {
+      const user = getCurrentUser();
+      if (!user) return;
+
+      document.getElementById('set-name').value = user.profile.name;
+      document.getElementById('set-currency').value = user.profile.currency;
+      document.getElementById('set-income').value = user.profile.monthlyIncome;
+      document.getElementById('set-savings').value = user.profile.currentSavings;
+      document.getElementById('set-goal').value = user.profile.goal;
+
+      document.getElementById('set-pct-needs').value = user.profile.split.needs;
+      document.getElementById('set-pct-wants').value = user.profile.split.wants;
+      document.getElementById('set-pct-savings').value = user.profile.split.savings;
+
+      document.getElementById('set-account-email').textContent = user.email;
+      renderSettingsFixedItems();
+    }
+
+    function handleSaveProfileSettings(e) {
+      e.preventDefault();
+      const name = document.getElementById('set-name').value.trim();
+      const newCurr = document.getElementById('set-currency').value;
+      const income = parseFloat(document.getElementById('set-income').value) || 0;
+      const savings = parseFloat(document.getElementById('set-savings').value) || 0;
+      const goal = document.getElementById('set-goal').value;
+
+      const needs = parseInt(document.getElementById('set-pct-needs').value) || 50;
+      const wants = parseInt(document.getElementById('set-pct-wants').value) || 30;
+      const savPct = parseInt(document.getElementById('set-pct-savings').value) || 20;
+
+      if (needs + wants + savPct !== 100) {
+        showToast(`Budget percentages must equal 100% (currently ${needs + wants + savPct}%).`, 'error');
+        return;
+      }
+
+      const user = getCurrentUser();
+      const oldCurr = user.profile.currency;
+
+      updateCurrentUser(u => {
+        u.profile.name = name;
+        u.profile.currency = newCurr;
+        u.profile.monthlyIncome = income;
+        u.profile.currentSavings = savings;
+        u.profile.goal = goal;
+        u.profile.split = { needs, wants, savings: savPct };
+
+        // Sync primary member income
+        const primary = u.familyMembers.find(m => m.id === 'fam_primary');
+        if (primary) {
+          primary.name = `${name} (You)`;
+          primary.income = income;
+        }
+      });
+
+      refreshAllAppUI();
+      showToast('Settings & budget guardrails updated!', 'success');
+    }
+
+    function addSettingsFixedItem() {
+      const nameEl = document.getElementById('set-fixed-name');
+      const amtEl = document.getElementById('set-fixed-amount');
+      const name = nameEl.value.trim();
+      const amount = parseFloat(amtEl.value);
+
+      if (!name || isNaN(amount) || amount <= 0) {
+        showToast('Enter valid item name and amount.', 'error');
+        return;
+      }
+
+      updateCurrentUser(user => {
+        user.mustSpendItems.push({ id: 'fix_' + Date.now(), name, amount });
+      });
+
+      nameEl.value = '';
+      amtEl.value = '';
+      renderSettingsFixedItems();
+      refreshAllAppUI();
+      showToast('Must-Spend item added.', 'success');
+    }
+
+    function removeSettingsFixedItem(id) {
+      updateCurrentUser(user => {
+        user.mustSpendItems = user.mustSpendItems.filter(i => i.id !== id);
+      });
+      renderSettingsFixedItems();
+      refreshAllAppUI();
+    }
+
+    function renderSettingsFixedItems() {
+      const user = getCurrentUser();
+      if (!user) return;
+      const listEl = document.getElementById('set-fixed-list');
+      listEl.innerHTML = user.mustSpendItems.length === 0
+        ? '<p class="text-xs text-muted italic">No fixed Must-Spend items locked yet.</p>'
+        : user.mustSpendItems.map(item => `
+            <div class="flex items-center justify-between px-3 py-2 rounded-xl bg-soft text-xs">
+              <span class="font-bold">${escapeHtml(item.name)}</span>
+              <div class="flex items-center gap-3">
+                <span class="font-extrabold text-rose-600">${formatMoney(item.amount)}</span>
+                <button type="button" onclick="removeSettingsFixedItem('${item.id}')" class="text-slate-400 hover:text-rose-600">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+            </div>
+          `).join('');
+    }
+
+    // Theme & Custom Background Image Engine
+    function applyTheme(themeName, persist = true) {
+      document.body.setAttribute('data-theme', themeName);
+      if (persist) {
+        updateCurrentUser(u => {
+          u.settings.theme = themeName;
+        });
+        showToast(`Theme switched to ${themeName.toUpperCase()}`, 'info');
+      }
+    }
+
+    function handleBgImageUpload(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      if (file.size > 2.5 * 1024 * 1024) {
+        showToast('Please select an image smaller than 2.5MB for browser storage.', 'error');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        setCustomBg(e.target.result, true);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function applyCustomBgUrl() {
+      const url = document.getElementById('bg-image-url').value.trim();
+      if (!url) {
+        showToast('Paste a valid image URL first.', 'error');
+        return;
+      }
+      setCustomBg(url, true);
+    }
+
+    function setCustomBg(imageUrl, persist = true) {
+      document.documentElement.style.setProperty('--custom-bg-url', `url("${imageUrl}")`);
+      document.body.classList.add('has-custom-bg');
+      if (persist) {
+        updateCurrentUser(u => {
+          u.settings.customBg = imageUrl;
+        });
+        showToast('Custom glassmorphic wallpaper applied!', 'success');
+      }
+    }
+
+    function clearCustomBg() {
+      document.body.classList.remove('has-custom-bg');
+      document.documentElement.style.removeProperty('--custom-bg-url');
+      updateCurrentUser(u => {
+        u.settings.customBg = '';
+      });
+      showToast('Custom wallpaper removed.', 'info');
+    }
+
+    // =========================================================================
+    // 14. DEMO SAMPLE DATA LOADER & RESET UTILITIES
+    // =========================================================================
+    function loadSampleData(fromOnboarding = false) {
+      const today = new Date();
+      const dStr = (offset) => {
+        const d = new Date(today);
+        d.setDate(d.getDate() - offset);
+        return d.toISOString().split('T')[0];
+      };
+
+      updateCurrentUser(user => {
+        user.onboarded = true;
+        user.profile = {
+          name: user.profile.name || 'Aarav Sharma',
+          currency: 'USD',
+          monthlyIncome: 5200,
+          currentSavings: 8400,
+          goal: 'Emergency Fund',
+          split: { needs: 50, wants: 30, savings: 20 }
+        };
+        user.mustSpendItems = [
+          { id: 'fix_1', name: 'Apartment Rent', amount: 1450 },
+          { id: 'fix_2', name: 'Utilities & Fiber Internet', amount: 220 },
+          { id: 'fix_3', name: 'School Tuition & Bus', amount: 380 }
+        ];
+        user.familyMembers = [
+          { id: 'fam_primary', name: 'Aarav (You)', role: 'Primary Account Holder', income: 5200, allowance: 0 },
+          { id: 'fam_2', name: 'Priya (Spouse)', role: 'Spouse / Partner', income: 2400, allowance: 350 },
+          { id: 'fam_3', name: 'Rohan (Kid)', role: 'Student', income: 0, allowance: 120 }
+        ];
+        user.transactions = [
+          { id: 'tx_1', amount: 1450, desc: 'Monthly Apartment Rent', category: 'Needs', member: 'Aarav (You)', date: dStr(5) },
+          { id: 'tx_2', amount: 380, desc: 'School Fee Installment', category: 'Needs', member: 'Rohan (Kid)', date: dStr(4) },
+          { id: 'tx_3', amount: 1100, desc: 'Emergency Vault Auto-Save', category: 'Savings', member: 'Aarav (You)', date: dStr(3) },
+          { id: 'tx_4', amount: 145, desc: 'Weekend Family Dinner', category: 'Wants', member: 'Priya (Spouse)', date: dStr(2) },
+          { id: 'tx_5', amount: 65, desc: 'Specialty Coffee & Books', category: 'Wants', member: 'Aarav (You)', date: dStr(1) },
+          { id: 'tx_6', amount: 42, desc: 'Student Art Supplies', category: 'Wants', member: 'Rohan (Kid)', date: dStr(0) }
+        ];
+        user.wishlist = [
+          { id: 'wish_1', name: '4K Ultrawide Monitor', price: 420, addedAt: Date.now() - 5 * 3600 * 1000 }
+        ];
+      });
+
+      showToast('Sample household financial data loaded!', 'success');
+      showAppView();
+    }
+
+    function openResetConfirmModal() {
+      openConfirmModal(
+        'Reset All Financial Data?',
+        'This will clear your transactions, family members, and budget settings so you can run the onboarding wizard again.',
+        () => {
+          updateCurrentUser(user => {
+            user.onboarded = false;
+            user.mustSpendItems = [];
+            user.familyMembers = [];
+            user.transactions = [];
+            user.wishlist = [];
+          });
+          showOnboardingView();
+          showToast('Financial data reset.', 'info');
+        }
+      );
+    }
+
+    // =========================================================================
+    // 15. CUSTOM CONFIRMATION MODAL, TOASTS & SANITIZATION HELPERS
+    // =========================================================================
+    function openConfirmModal(title, message, onConfirmCallback) {
+      document.getElementById('confirm-modal-title').textContent = title;
+      document.getElementById('confirm-modal-msg').textContent = message;
+      const yesBtn = document.getElementById('confirm-modal-yes-btn');
+      yesBtn.onclick = function () {
+        closeConfirmModal();
+        onConfirmCallback();
+      };
+      document.getElementById('modal-confirm').classList.remove('hidden');
+    }
+
+    function closeConfirmModal() {
+      document.getElementById('modal-confirm').classList.add('hidden');
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+
+      let colors = 'bg-slate-900 text-white border-slate-700';
+      let icon = 'fa-circle-info text-sky-400';
+      if (type === 'success') {
+        colors = 'bg-emerald-950 text-emerald-50 border-emerald-700';
+        icon = 'fa-circle-check text-emerald-400';
+      } else if (type === 'error') {
+        colors = 'bg-rose-950 text-rose-50 border-rose-700';
+        icon = 'fa-circle-exclamation text-rose-400';
+      }
+
+      toast.className = `pointer-events-auto px-4 py-3 rounded-xl border shadow-xl text-xs font-semibold flex items-center gap-2.5 animate-fade-in ${colors}`;
+      toast.innerHTML = `<i class="fa-solid ${icon} text-sm"></i><span>${escapeHtml(message)}</span>`;
+
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 3400);
+    }
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function formatMarkdownSimple(text) {
+      return escapeHtml(text)
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\n/g, '<br>');
+    }
+  </script>
+</body>
+</html>
